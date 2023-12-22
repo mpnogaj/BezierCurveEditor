@@ -11,6 +11,8 @@ namespace BezierCurveEditor.Controls
 {
 	public partial class Canvas : UserControl
 	{
+		public bool UnsavedChanges { get; private set; }
+
 		public event EventHandler<EventArgs> StatusChanged;
 
 		public void OnStatusChanged()
@@ -173,10 +175,13 @@ namespace BezierCurveEditor.Controls
 			curve.CurveChanged += Curve_CurveChanged;
 			curve.CurveRemoved += Curve_CurveRemoved;
 			curve.DraggablePoints.CollectionChanged += (o, args) => { OnPointsHierarchyChanged(curve); };
+			
+			UnsavedChanges = true;
 		}
 
 		private void Curve_CurveChanged(object sender, EventArgs e)
 		{
+			UnsavedChanges = true;
 			this.Invalidate();
 		}
 
@@ -187,6 +192,7 @@ namespace BezierCurveEditor.Controls
 			curve.CurveChanged -= Curve_CurveChanged;
 			this.Curves.Remove(curve);
 
+			UnsavedChanges = true;
 			this.Invalidate();
 		}
 
@@ -211,6 +217,8 @@ namespace BezierCurveEditor.Controls
 				Y = y.Location.Y
 			}).ToList()).ToList();
 
+			this.UnsavedChanges = false;
+
 			return new DataModel()
 			{
 				CanvasHeight = this.Height,
@@ -232,16 +240,25 @@ namespace BezierCurveEditor.Controls
 				CreateCurve(points);
 			}
 
+			//we just loaded those curves from file
+			//clear flag
+			UnsavedChanges = false;
+
 			this.Invalidate();
 		}
 
-		public void Clear()
+		public void Clear(bool shouldMarkUnsavedChanges = true)
 		{
 			while(Curves.Count > 0)
 			{
 				Curves[0].DeleteCurve();
 			}
 
+			//sometimes we want to clear all curves set UnsavedChanges flag
+			if (!shouldMarkUnsavedChanges)
+			{
+				UnsavedChanges = false;
+			}
 
 			this.Invalidate();
 		}

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace BezierCurveEditor.Controls
@@ -47,7 +45,11 @@ namespace BezierCurveEditor.Controls
 			if (Curve.Selected)
 			{
 				var color = PointSelected ? _activeColor : _inactiveColor;
-				e.Graphics.FillEllipse(new SolidBrush(color), ((Control)sender).ClientRectangle);
+				var pen = new Pen(new SolidBrush(color), 2f);
+
+				var rect = ((Control)sender).ClientRectangle;
+				
+				e.Graphics.DrawRectangle(pen, ((Control)sender).ClientRectangle);
 			}
 		}
 

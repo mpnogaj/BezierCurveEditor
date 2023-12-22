@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Windows.Forms;
 using BezierCurveEditor.Controls;
@@ -31,12 +33,17 @@ namespace BezierCurveEditor
 			InitializeComponent();
 			canvas.Resizeable();
 
-			canvas.StatusChanged += (sender, args) => { canvasModeStatusLabel.Text = canvas.Status; };
+			canvas.StatusChanged += Canvas_StatusChanged;
 
 			canvas.Curves.CollectionChanged += CurvesOnCollectionChanged;
 			canvas.PointsHierarchyChanged += CanvasOnPointsHierarchyChanged;
 
 			canvas.ModeChanged += CanvasOnModeChanged;
+		}
+
+		private void Canvas_StatusChanged(object sender, EventArgs e)
+		{
+			canvasModeStatusLabel.Text = canvas.Status;
 		}
 
 		private void CanvasOnModeChanged(object sender, ModeChangedEventArgs e)
@@ -125,6 +132,7 @@ namespace BezierCurveEditor
 		private void MainWindow_KeyUp(object sender, KeyEventArgs e)
 		{
 			canvas.HandleKeyPressed(e.KeyCode);
+			e.SuppressKeyPress = true;
 		}
 
 		private void curvesView_BeforeSelect(object sender, TreeViewCancelEventArgs e)
@@ -177,7 +185,7 @@ namespace BezierCurveEditor
 		}
 
 
-		private bool SaveAs()
+		private bool PickFileName()
 		{
 			var sfd = new SaveFileDialog()
 			{
@@ -206,13 +214,25 @@ namespace BezierCurveEditor
 
 		private void newFileMenu_Click(object sender, EventArgs e)
 		{
+			if (canvas.UnsavedChanges)
+			{
+				var handled = UnsavedChangesPopup();
+				if (!handled) return;
+			}
+
 			FileName = string.Empty;
-			canvas.Clear();
+			canvas.Clear(false);
 			curvesView.Nodes.Clear();
 		}
 
 		private void openFileMenu_Click(object sender, System.EventArgs e)
 		{
+			if (canvas.UnsavedChanges)
+			{
+				var handled = UnsavedChangesPopup();
+				if (!handled) return;
+			}
+
 			var ofd = new OpenFileDialog
 			{
 				InitialDirectory = _defaultPath,
@@ -238,7 +258,7 @@ namespace BezierCurveEditor
 		{
 			if (FileName == string.Empty)
 			{
-				if (!SaveAs()) return;
+				if (!PickFileName()) return;
 			}
 
 			Save();
@@ -246,7 +266,7 @@ namespace BezierCurveEditor
 
 		private void saveAsFileMenu_Click(object sender, EventArgs e)
 		{
-			if (!SaveAs()) return;
+			if (!PickFileName()) return;
 
 			Save();
 		}
@@ -254,6 +274,39 @@ namespace BezierCurveEditor
 		private void exitFileMenu_Click(object sender, EventArgs e)
 		{
 			this.Close();
+		}
+
+		private bool UnsavedChangesPopup()
+		{
+			var dialogRes = MessageBox.Show("You have unsaved changes. Do you want to save them?", "Unsaved changes",
+				MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+
+			switch (dialogRes)
+			{
+				case DialogResult.Yes:
+					if (FileName == string.Empty)
+					{
+						if (!PickFileName()) return false;
+					}
+
+					Save();
+					return true;
+				case DialogResult.No:
+					return true;
+				case DialogResult.Cancel:
+					return false;
+			}
+
+			return false;
+		}
+
+		private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			if (canvas.UnsavedChanges)
+			{
+				var handled = UnsavedChangesPopup();
+				e.Cancel = !handled;
+			}
 		}
 	}
 }

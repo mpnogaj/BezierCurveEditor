@@ -92,6 +92,9 @@
     <Compile Include="Controls\DraggablePoint.Designer.cs">
       <DependentUpon>DraggablePoint.cs</DependentUpon>
     </Compile>
+    <Compile Include="CustomPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DataModel.cs" />
     <Compile Include="EditorMode.cs" />
     <Compile Include="ExtTreeNode.cs" />

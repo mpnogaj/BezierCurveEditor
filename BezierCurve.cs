@@ -23,7 +23,7 @@ namespace BezierCurveEditor
 			CurveRemoved?.Invoke(this, EventArgs.Empty);
 		}
 
-		private bool _selected = false;
+		private bool _selected = true;
 
 		public bool Selected
 		{
@@ -32,6 +32,12 @@ namespace BezierCurveEditor
 			{
 				if (value == _selected) return;
 				_selected = value;
+
+				foreach (var draggablePoint in DraggablePoints)
+				{
+					draggablePoint.Visible = value;
+				}
+
 				OnCurveChanged();
 			}
 		}
@@ -53,6 +59,8 @@ namespace BezierCurveEditor
 		{
 			_parentControl = parent;
 			InitializePoints(points);
+
+			Selected = false;
 		}
 
 		private void InitializePoints(List<Point> points)
