@@ -316,7 +316,7 @@ namespace BezierCurveEditor
 		{
 			//todo:
 			string appPath = Assembly.GetEntryAssembly().Location;
-			string filename = Path.Combine(Path.GetDirectoryName(appPath), "help.htm");
+			string filename = Path.Combine(Path.GetDirectoryName(appPath), "help.html");
 			Process.Start(filename);
 		}
 
