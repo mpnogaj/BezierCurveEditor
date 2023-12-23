@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -13,6 +12,10 @@ namespace BezierCurveEditor.Controls
 	{
 		public bool UnsavedChanges { get; private set; }
 
+		#region Events
+
+		#region StatusChangedEvent
+
 		public event EventHandler<EventArgs> StatusChanged;
 
 		public void OnStatusChanged()
@@ -20,16 +23,13 @@ namespace BezierCurveEditor.Controls
 			StatusChanged?.Invoke(this, EventArgs.Empty);
 		}
 
-		public event EventHandler<PointsHierarchyChangedEventArgs> PointsHierarchyChanged;
+		#endregion
 
-		public void OnPointsHierarchyChanged(BezierCurve curve)
-		{
-			PointsHierarchyChanged?.Invoke(this, new PointsHierarchyChangedEventArgs(curve));
-		}
+		#region ModeChangedEvent
 
 		public event EventHandler<ModeChangedEventArgs> ModeChanged;
 
-		public void OnModeChanged()
+		private void OnModeChanged()
 		{
 			var modeType = ModeType.Unknown;
 			try
@@ -40,8 +40,57 @@ namespace BezierCurveEditor.Controls
 			{
 				Debug.WriteLine(ex);
 			}
+
 			ModeChanged?.Invoke(this, new ModeChangedEventArgs(modeType));
 		}
+
+		#endregion
+
+
+		public event EventHandler<PointsHierarchyChangedEventArgs> PointsHierarchyChanged;
+
+		private void OnPointsHierarchyChanged(BezierCurve curve)
+		{
+			PointsHierarchyChanged?.Invoke(this, new PointsHierarchyChangedEventArgs(curve));
+		}
+
+		#region CurvesUpdateEvents
+
+		/// <summary>
+		/// Occurs when curve is added to the list
+		/// </summary>
+		public event EventHandler<CurvesUpdatedEventArgs> CurveAdded;
+
+		private void OnCurveAdded(BezierCurve curve, int index)
+		{
+			CurveAdded?.Invoke(this, new CurvesUpdatedEventArgs(curve, index));
+		}
+
+		/// <summary>
+		/// Occurs when curve is removed from the list
+		/// </summary>
+		public event EventHandler<CurvesUpdatedEventArgs> CurveRemoved;
+
+		private void OnCurveRemoved(BezierCurve curve, int index)
+		{
+			CurveRemoved?.Invoke(this, new CurvesUpdatedEventArgs(curve, index));
+		}
+
+		/// <summary>
+		/// Occurs when curve list is cleared
+		/// </summary>
+		public event EventHandler<EventArgs> CurvesCleared;
+		
+		private void OnCurvesCleared()
+		{
+			CurvesCleared?.Invoke(this, EventArgs.Empty);
+		}
+
+		#endregion
+
+
+
+		#endregion
 
 		private string _status = string.Empty;
 
@@ -58,6 +107,10 @@ namespace BezierCurveEditor.Controls
 
 		private readonly Dictionary<ModeType, EditorMode> _modes;
 		private EditorMode _currentMode;
+
+		private readonly List<Point> _addCurveBuffer = new List<Point>();
+		public List<BezierCurve> Curves { get; } = new List<BezierCurve>();
+
 
 		public EditorMode CurrentMode
 		{
@@ -76,9 +129,7 @@ namespace BezierCurveEditor.Controls
 			}
 		}
 
-		private readonly List<Point> _addCurveBuffer = new List<Point>();
-
-		public ObservableCollection<BezierCurve> Curves { get; } = new ObservableCollection<BezierCurve>();
+		#region Ctor
 
 		public Canvas()
 		{
@@ -123,6 +174,9 @@ namespace BezierCurveEditor.Controls
 							curve.DisableDrag();
 						}
 					})
+				},
+				{
+					ModeType.Append, new EditorMode(Keys.A, "Append mode", () => { }, () => { })
 				}
 			};
 
@@ -133,6 +187,8 @@ namespace BezierCurveEditor.Controls
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 			SetStyle(ControlStyles.UserPaint, true);
 		}
+
+		#endregion
 
 		private void Canvas_Paint(object sender, PaintEventArgs e)
 		{
@@ -155,16 +211,30 @@ namespace BezierCurveEditor.Controls
 
 		private void Canvas_MouseUp(object sender, MouseEventArgs e)
 		{
-			if (e.Button == MouseButtons.Left && _currentMode == _modes[ModeType.Insert])
+			if (e.Button == MouseButtons.Left)
 			{
-				_addCurveBuffer.Add(e.Location);
-				if (ModifierKeys == Keys.Shift && _addCurveBuffer.Count > 1)
+				if (_currentMode == _modes[ModeType.Insert])
 				{
-					CreateCurve(_addCurveBuffer);
-					_addCurveBuffer.Clear();
-				}
+					_addCurveBuffer.Add(e.Location);
+					if (ModifierKeys == Keys.Shift && _addCurveBuffer.Count > 1)
+					{
+						CreateCurve(_addCurveBuffer);
+						_addCurveBuffer.Clear();
+					}
 
-				this.Invalidate();
+					this.Invalidate();
+				}
+				else if (_currentMode == _modes[ModeType.Append])
+				{
+					var selectedCurve = Curves.FirstOrDefault(x => x.Selected);
+					if (selectedCurve != null)
+					{
+						var newPointIndex = selectedCurve.DraggablePoints.TakeWhile(x => !x.PointSelected).Count();
+						if (newPointIndex < selectedCurve.DraggablePoints.Count)
+							newPointIndex++;
+						selectedCurve.InsertPoint(e.Location, newPointIndex);
+					}
+				}
 			}
 		}
 
@@ -172,14 +242,19 @@ namespace BezierCurveEditor.Controls
 		{
 			var curve = new BezierCurve(points, this);
 			Curves.Add(curve);
-			curve.CurveChanged += Curve_CurveChanged;
+			curve.CurveShouldBeRepainted += CurveCurveShouldBeRepainted;
 			curve.CurveRemoved += Curve_CurveRemoved;
-			curve.DraggablePoints.CollectionChanged += (o, args) => { OnPointsHierarchyChanged(curve); };
-			
+			curve.PointListChanged += CurveOnPointListChanged;
+
+			OnCurveAdded(curve, Curves.Count - 1);
+
 			UnsavedChanges = true;
 		}
 
-		private void Curve_CurveChanged(object sender, EventArgs e)
+
+		#region CurveEventHandlers 
+
+		private void CurveCurveShouldBeRepainted(object sender, EventArgs e)
 		{
 			UnsavedChanges = true;
 			this.Invalidate();
@@ -188,19 +263,38 @@ namespace BezierCurveEditor.Controls
 		private void Curve_CurveRemoved(object sender, EventArgs e)
 		{
 			var curve = (BezierCurve)sender;
+
+			var index = this.Curves.IndexOf(curve);
+			if (index < 0)
+			{
+				throw new InvalidOperationException("Curve wasn't in the list!");
+			}
+
+			this.Curves.RemoveAt(index);
 			curve.CurveRemoved -= Curve_CurveRemoved;
-			curve.CurveChanged -= Curve_CurveChanged;
-			this.Curves.Remove(curve);
+			curve.CurveShouldBeRepainted -= CurveCurveShouldBeRepainted;
+			curve.PointListChanged -= CurveOnPointListChanged;
+			
+			OnCurveRemoved(curve, index);
 
 			UnsavedChanges = true;
 			this.Invalidate();
 		}
 
+		private void CurveOnPointListChanged(object sender, EventArgs e)
+		{
+			OnPointsHierarchyChanged((BezierCurve)sender);
+			UnsavedChanges = true;
+		}
 
-		public void HandleKeyPressed(Keys key)
+		#endregion
+
+		public bool HandleKeyPressed(Keys key)
 		{
 			var mode = _modes.Values.FirstOrDefault(x => x.ModeKey == key);
-			if (mode != null) CurrentMode = mode;
+			if (mode == null) return false;
+			CurrentMode = mode;
+			return true;
 		}
 
 		public void ChangeMode(ModeType mode)
@@ -249,7 +343,7 @@ namespace BezierCurveEditor.Controls
 
 		public void Clear(bool shouldMarkUnsavedChanges = true)
 		{
-			while(Curves.Count > 0)
+			while (Curves.Count > 0)
 			{
 				Curves[0].DeleteCurve();
 			}
@@ -274,6 +368,18 @@ namespace BezierCurveEditor.Controls
 		public BezierCurve Curve { get; private set; }
 	}
 
+	public class CurvesUpdatedEventArgs
+	{
+		public CurvesUpdatedEventArgs(BezierCurve curve, int index)
+		{
+			Curve = curve;
+			Index = index;
+		}
+
+		public BezierCurve Curve { get; private set; }
+		public int Index { get; private set; }
+	}
+
 	public class ModeChangedEventArgs
 	{
 		public ModeChangedEventArgs(ModeType mode)
@@ -290,6 +396,7 @@ namespace BezierCurveEditor.Controls
 		Insert = 1,
 		Delete = 2,
 		Move = 3,
+		Append = 4,
 		Unknown
 	}
 }

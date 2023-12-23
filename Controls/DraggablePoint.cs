@@ -24,6 +24,31 @@ namespace BezierCurveEditor.Controls
 			}
 		}
 
+		private bool _removable = false;
+
+		public bool Removable
+		{
+			get => _removable;
+			set
+			{
+				if (value == _removable) return;
+				_removable = value;
+				if (_removable)
+				{
+					this.Click += DraggablePoint_Remove_Click;
+				}
+				else
+				{
+					this.Click -= DraggablePoint_Remove_Click;
+				}
+			}
+		}
+
+		private void DraggablePoint_Remove_Click(object sender, EventArgs e)
+		{
+			this.Curve.DeletePoint(this);
+		}
+
 		public BezierCurve Curve { get;}
 
 		public DraggablePoint(BezierCurve curve)
@@ -37,27 +62,20 @@ namespace BezierCurveEditor.Controls
 
 			this.BackColor = Color.Transparent;
 			Curve = curve;
-			PointSelected = false;
 		}
 
 		private void DraggablePoint_Paint(object sender, PaintEventArgs e)
 		{
-			if (Curve.Selected)
-			{
-				var color = PointSelected ? _activeColor : _inactiveColor;
-				var pen = new Pen(new SolidBrush(color), 2f);
+			//do not draw points if curve isn't selected
+			if (!Curve.Selected) return;
 
-				var rect = ((Control)sender).ClientRectangle;
-				
-				e.Graphics.DrawRectangle(pen, ((Control)sender).ClientRectangle);
-			}
+			var color = PointSelected ? _activeColor : _inactiveColor;
+			var pen = new Pen(new SolidBrush(color), 2f);
+
+			e.Graphics.DrawRectangle(pen, ((Control)sender).ClientRectangle);
 		}
 
-		public void RemovePoint()
-		{
-			this.Parent.Controls.Remove(this);
-		}
-
+		//Enable/disable isHitTest
 		private const int WM_NCHITTEST = 0x84;
 		private const int HTTRANSPARENT = -1;
 

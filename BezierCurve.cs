@@ -10,21 +10,38 @@ namespace BezierCurveEditor
 {
 	public class BezierCurve
 	{
-		public event EventHandler<EventArgs> CurveChanged;
+		/// <summary>
+		/// Occurs when curve should be repainted
+		/// </summary>
+		public event EventHandler<EventArgs> CurveShouldBeRepainted;
+		
+		private void OnCurveShouldBeRepainted()
+		{
+			CurveShouldBeRepainted?.Invoke(this, EventArgs.Empty);
+		}
+		
+		/// <summary>
+		/// Occurs when curve is removed
+		/// </summary>
 		public event EventHandler<EventArgs> CurveRemoved;
 
-		public void OnCurveChanged()
-		{
-			CurveChanged?.Invoke(this, EventArgs.Empty);
-		}
-
-		public void OnCurveRemoved()
+		private void OnCurveRemoved()
 		{
 			CurveRemoved?.Invoke(this, EventArgs.Empty);
 		}
 
-		private bool _selected = true;
+		/// <summary>
+		/// Occurs when new point is added to list, or removed
+		/// </summary>
+		public event EventHandler<EventArgs> PointListChanged;
 
+		public void OnPointListChanged()
+		{
+			PointListChanged?.Invoke(this, EventArgs.Empty);
+		}
+		
+
+		private bool _selected = true;
 		public bool Selected
 		{
 			get => _selected;
@@ -38,7 +55,7 @@ namespace BezierCurveEditor
 					draggablePoint.Visible = value;
 				}
 
-				OnCurveChanged();
+				OnCurveShouldBeRepainted();
 			}
 		}
 
@@ -76,6 +93,42 @@ namespace BezierCurveEditor
 			_parentControl.Controls.AddRange(DraggablePoints.Cast<Control>().ToArray());
 		}
 
+
+		public void InsertPoint(Point point, int index)
+		{
+			var draggablePoint = new DraggablePoint(this);
+			draggablePoint.LocationChanged += DraggablePoint_LocationChanged;
+			draggablePoint.Location = point;
+			DraggablePoints.Insert(index, draggablePoint);
+			_parentControl.Controls.Add(draggablePoint);
+
+			OnPointListChanged();
+		}
+
+		public void DeleteCurve()
+		{
+			foreach (var curvePoints in DraggablePoints)
+			{
+				_parentControl.Controls.Remove(curvePoints);
+			}
+			DraggablePoints.Clear();
+			OnCurveRemoved();
+		}
+
+		public void DeletePoint(DraggablePoint point)
+		{
+			point.Parent.Controls.Remove(point);
+			DraggablePoints.Remove(point);
+
+			//delete curve
+			if (DraggablePoints.Count == 1)
+			{
+				DeleteCurve();
+				return;
+			}
+			OnPointListChanged();
+		}
+
 		public void DisableDrag()
 		{
 			foreach (var draggablePoint in DraggablePoints)
@@ -94,12 +147,11 @@ namespace BezierCurveEditor
 			}
 		}
 
-
 		public void DisableDelete()
 		{
 			foreach (var draggablePoint in DraggablePoints)
 			{
-				draggablePoint.DisableDeletion();
+				draggablePoint.Removable = false;
 				draggablePoint.Cursor = Cursors.Default;
 			}
 		}
@@ -108,37 +160,9 @@ namespace BezierCurveEditor
 		{
 			foreach (var draggablePoint in DraggablePoints)
 			{
-				draggablePoint.EnableDeletion((control) =>
-				{
-					var point = (DraggablePoint)control;
-					DeletePoint(point);
-				});
+				draggablePoint.Removable = true;
 				draggablePoint.Cursor = Cursors.Cross;
 			}
-		}
-
-		public void DeleteCurve()
-		{
-			foreach (var curvePoints in DraggablePoints)
-			{
-				_parentControl.Controls.Remove(curvePoints);
-			}
-			DraggablePoints.Clear();
-			OnCurveRemoved();
-		}
-
-		public void DeletePoint(DraggablePoint point)
-		{
-			point.RemovePoint();
-			DraggablePoints.Remove(point);
-
-			//delete curve
-			if (DraggablePoints.Count == 1)
-			{
-				DeleteCurve();
-				return;
-			}
-			OnCurveChanged();
 		}
 
 		private void DraggablePoint_LocationChanged(object sender, EventArgs e)
@@ -149,10 +173,12 @@ namespace BezierCurveEditor
 			var newLocation = new Point(Math.Max(location.X, 0), Math.Max(location.Y, 0));
 			senderControl.Location = newLocation;
 
-			OnCurveChanged();
+			OnCurveShouldBeRepainted();
 		}
 
-		public PointF[] GetBezierApproximation(int outputSegmentCount)
+		#region BezierPointsApproximation
+
+		public PointF[] GetBezierApproximation(int outputSegmentCount = 128)
 		{
 			var controlPoints = this.ControlPoints;
 
@@ -169,10 +195,12 @@ namespace BezierCurveEditor
 		{
 			if (count == 1)
 				return controlPoints[index];
-			var P0 = GetBezierPoint(t, controlPoints, index, count - 1);
-			var P1 = GetBezierPoint(t, controlPoints, index + 1, count - 1);
-			return new PointF(Convert.ToSingle((1 - t) * P0.X + t * P1.X), Convert.ToSingle((1 - t) * P0.Y + t * P1.Y));
+			var p0 = GetBezierPoint(t, controlPoints, index, count - 1);
+			var p1 = GetBezierPoint(t, controlPoints, index + 1, count - 1);
+			return new PointF(Convert.ToSingle((1 - t) * p0.X + t * p1.X), Convert.ToSingle((1 - t) * p0.Y + t * p1.Y));
 		}
+
+		#endregion
 	}
 
 	internal static class BezierCurveExtensions
