@@ -30,8 +30,6 @@
 		{
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.canvasModeStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-			this.canvasPanel = new CustomPanel();
-			this.canvas = new BezierCurveEditor.Controls.Canvas();
 			this.curvesView = new System.Windows.Forms.TreeView();
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
@@ -45,9 +43,11 @@
 			this.saveAsFileMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			this.exitFileMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.canvasPanel = new BezierCurveEditor.CustomPanel();
+			this.canvas = new BezierCurveEditor.Controls.Canvas();
 			this.statusStrip1.SuspendLayout();
-			this.canvasPanel.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
+			this.canvasPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// statusStrip1
@@ -68,39 +68,17 @@
 			this.canvasModeStatusLabel.Size = new System.Drawing.Size(99, 17);
 			this.canvasModeStatusLabel.Text = "Test123 status bar";
 			// 
-			// canvasPanel
-			// 
-			this.canvasPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.canvasPanel.AutoScroll = true;
-			this.canvasPanel.Controls.Add(this.canvas);
-			this.canvasPanel.Location = new System.Drawing.Point(104, 38);
-			this.canvasPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-			this.canvasPanel.Name = "canvasPanel";
-			this.canvasPanel.Size = new System.Drawing.Size(914, 446);
-			this.canvasPanel.TabIndex = 3;
-			// 
-			// canvas
-			// 
-			this.canvas.BackColor = System.Drawing.SystemColors.ButtonShadow;
-			this.canvas.Location = new System.Drawing.Point(2, 2);
-			this.canvas.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-			this.canvas.Name = "canvas";
-			this.canvas.Size = new System.Drawing.Size(656, 349);
-			this.canvas.TabIndex = 0;
-			// 
 			// curvesView
 			// 
 			this.curvesView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.curvesView.HideSelection = false;
 			this.curvesView.Location = new System.Drawing.Point(9, 38);
-			this.curvesView.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.curvesView.Margin = new System.Windows.Forms.Padding(2);
 			this.curvesView.Name = "curvesView";
 			this.curvesView.Size = new System.Drawing.Size(92, 447);
 			this.curvesView.TabIndex = 1;
-			this.curvesView.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.curvesView_BeforeSelect);
+			this.curvesView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.curvesView_AfterSelect);
 			this.curvesView.KeyUp += new System.Windows.Forms.KeyEventHandler(this.curvesView_KeyUp);
 			// 
 			// label1
@@ -112,6 +90,7 @@
 			this.label1.Size = new System.Drawing.Size(40, 13);
 			this.label1.TabIndex = 4;
 			this.label1.Text = "Curves";
+			this.label1.Click += new System.EventHandler(this.label1_Click);
 			// 
 			// label2
 			// 
@@ -200,6 +179,29 @@
 			this.exitFileMenu.Text = "Exit";
 			this.exitFileMenu.Click += new System.EventHandler(this.exitFileMenu_Click);
 			// 
+			// canvasPanel
+			// 
+			this.canvasPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.canvasPanel.AutoScroll = true;
+			this.canvasPanel.Controls.Add(this.canvas);
+			this.canvasPanel.Location = new System.Drawing.Point(104, 38);
+			this.canvasPanel.Margin = new System.Windows.Forms.Padding(2);
+			this.canvasPanel.Name = "canvasPanel";
+			this.canvasPanel.Size = new System.Drawing.Size(914, 446);
+			this.canvasPanel.TabIndex = 3;
+			// 
+			// canvas
+			// 
+			this.canvas.BackColor = System.Drawing.SystemColors.ButtonShadow;
+			this.canvas.Location = new System.Drawing.Point(2, 2);
+			this.canvas.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.canvas.Name = "canvas";
+			this.canvas.SelectedItem = null;
+			this.canvas.Size = new System.Drawing.Size(656, 349);
+			this.canvas.TabIndex = 0;
+			// 
 			// MainWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -213,16 +215,16 @@
 			this.Controls.Add(this.menuStrip1);
 			this.KeyPreview = true;
 			this.MainMenuStrip = this.menuStrip1;
-			this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.Margin = new System.Windows.Forms.Padding(2);
 			this.Name = "MainWindow";
 			this.Text = "Form1";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
 			this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainWindow_KeyUp);
 			this.statusStrip1.ResumeLayout(false);
 			this.statusStrip1.PerformLayout();
-			this.canvasPanel.ResumeLayout(false);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
+			this.canvasPanel.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

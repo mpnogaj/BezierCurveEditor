@@ -18,8 +18,6 @@ namespace BezierCurveEditor.Controls
 			{
 				if (value == _pointSelected) return;
 				_pointSelected = value;
-				this.Curve.Selected = value;
-
 				this.Invalidate();
 			}
 		}

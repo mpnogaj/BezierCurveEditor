@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -37,7 +38,47 @@ namespace BezierCurveEditor
 			
 			canvas.PointsHierarchyChanged += CanvasOnPointsHierarchyChanged;
 
+			canvas.SelectedItemChanged += Canvas_SelectedItemChanged;
+
 			canvas.ModeChanged += CanvasOnModeChanged;
+		}
+
+		private void Canvas_SelectedItemChanged(object sender, SelectedItemChangedEventArgs e)
+		{
+			switch (e.Object)
+			{
+				case null:
+					curvesView.SelectedNode = null;
+					break;
+				case BezierCurve curve:
+				{
+					var nodeToSelect = curvesView.Nodes
+						.OfType<ExtTreeNode<BezierCurve>>()
+						.FirstOrDefault(x => x.Data == curve);
+
+					curvesView.SelectedNode = nodeToSelect;
+					break;
+				}
+				case DraggablePoint point:
+				{
+					var curveNode = curvesView.Nodes
+						.OfType<ExtTreeNode<BezierCurve>>()
+						.FirstOrDefault(x => x.Data == point.Curve);
+
+					if (curveNode == null)
+					{
+						curvesView.SelectedNode = null;
+						return;
+					}
+
+					var pointNode = curveNode.Nodes
+						.OfType<ExtTreeNode<DraggablePoint>>()
+						.FirstOrDefault(x => x.Data == point);
+
+					curvesView.SelectedNode = pointNode;
+					break;
+				}
+			}
 		}
 
 		private void Canvas_CurveAdded(object sender, CurvesUpdatedEventArgs e)
@@ -68,7 +109,7 @@ namespace BezierCurveEditor
 
 		private void CanvasOnModeChanged(object sender, ModeChangedEventArgs e)
 		{
-			var selectedNode = curvesView.SelectedNode;
+			/*var selectedNode = curvesView.SelectedNode;
 			if ((e.Mode == ModeType.Normal || e.Mode == ModeType.Insert) && selectedNode != null)
 			{
 				switch (selectedNode)
@@ -82,7 +123,7 @@ namespace BezierCurveEditor
 				}
 
 				curvesView.SelectedNode = null;
-			}
+			}*/
 		}
 
 		private void CanvasOnPointsHierarchyChanged(object sender, PointsHierarchyChangedEventArgs e)
@@ -108,35 +149,6 @@ namespace BezierCurveEditor
 		private void MainWindow_KeyUp(object sender, KeyEventArgs e)
 		{
 			e.SuppressKeyPress = canvas.HandleKeyPressed(e.KeyCode);
-		}
-
-		private void curvesView_BeforeSelect(object sender, TreeViewCancelEventArgs e)
-		{
-			var oldSelectedNode = curvesView.SelectedNode;
-
-			switch (oldSelectedNode)
-			{
-				case ExtTreeNode<BezierCurve> oldSelectedCurve:
-					oldSelectedCurve.Data.Selected = false;
-					break;
-				case ExtTreeNode<DraggablePoint> oldSelectedPoint:
-					oldSelectedPoint.Data.PointSelected = false;
-					break;
-			}
-
-			var newSelectedNode = e.Node;
-
-			switch (newSelectedNode)
-			{
-				case ExtTreeNode<BezierCurve> newSelectedCurve:
-					newSelectedCurve.Data.Selected = true;
-					break;
-				case ExtTreeNode<DraggablePoint> newSelectedPoint:
-					newSelectedPoint.Data.PointSelected = true;
-					break;
-			}
-
-			canvas.ChangeMode(ModeType.Move);
 		}
 
 		private void curvesView_KeyUp(object sender, KeyEventArgs e)
@@ -282,6 +294,27 @@ namespace BezierCurveEditor
 				var handled = UnsavedChangesPopup();
 				e.Cancel = !handled;
 			}
+		}
+
+		private void curvesView_AfterSelect(object sender, TreeViewEventArgs e)
+		{
+			if (e.Action == TreeViewAction.Unknown)
+			{
+				curvesView.SelectedNode = null;
+				return;
+			}
+			
+			canvas.SelectedItem = e.Node switch
+			{
+				ExtTreeNode<BezierCurve> curveNode => curveNode.Data,
+				ExtTreeNode<DraggablePoint> pointNode => pointNode.Data,
+				_ => null
+			};
+		}
+
+		private void label1_Click(object sender, EventArgs e)
+		{
+			curvesView.SelectedNode = null;
 		}
 	}
 }

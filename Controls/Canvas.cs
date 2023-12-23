@@ -88,7 +88,13 @@ namespace BezierCurveEditor.Controls
 
 		#endregion
 
+		public event EventHandler<SelectedItemChangedEventArgs> SelectedItemChanged;
 
+		private void OnSelectedItemChanged(object item)
+		{
+			var type = item?.GetType();
+			SelectedItemChanged?.Invoke(this, new SelectedItemChangedEventArgs(type, item));
+		}
 
 		#endregion
 
@@ -102,6 +108,67 @@ namespace BezierCurveEditor.Controls
 				if (value == Status) return;
 				_status = value;
 				OnStatusChanged();
+			}
+		}
+
+		private object _selectedItem = null;
+
+		public object SelectedItem
+		{
+			get => _selectedItem;
+			set
+			{
+				if(value == _selectedItem) return;
+
+				var previousValue = _selectedItem;
+
+				switch (previousValue)
+				{
+					case null:
+						switch (value)
+						{
+							case BezierCurve curve:
+								curve.Selected = true;
+								break;
+							case DraggablePoint point:
+								point.PointSelected = true;
+								point.Curve.Selected = true;
+								break;
+						}
+
+						break;
+					case BezierCurve previousCurve:
+						previousCurve.Selected = false;
+						switch (value)
+						{
+							case BezierCurve curve:
+								curve.Selected = true;
+								break;
+							case DraggablePoint point:
+								point.PointSelected = true;
+								point.Curve.Selected = true;
+								break;
+						}
+						break;
+					case DraggablePoint previousPoint:
+						previousPoint.PointSelected = false;
+						previousPoint.Curve.Selected = false;
+						switch (value)
+						{
+							case BezierCurve curve:
+								curve.Selected = true;
+								break;
+							case DraggablePoint point:
+								point.PointSelected = true;
+								point.Curve.Selected = true;
+								break;
+						}
+						break;
+				}
+
+				_selectedItem = value;
+
+				OnSelectedItemChanged(_selectedItem);
 			}
 		}
 
@@ -137,9 +204,15 @@ namespace BezierCurveEditor.Controls
 
 			_modes = new Dictionary<ModeType, EditorMode>
 			{
-				{ ModeType.Normal, new EditorMode(Keys.Escape, "Normal mode", () => { }, () => { }) },
+				{ ModeType.Normal, new EditorMode(Keys.Escape, "Normal mode", () =>
 				{
-					ModeType.Insert, new EditorMode(Keys.I, "Insert mode", () => { }, () =>
+					SelectedItem = null;
+				}, () => { }) },
+				{
+					ModeType.Insert, new EditorMode(Keys.I, "Insert mode", () =>
+					{
+						SelectedItem = null;
+					}, () =>
 					{
 						_addCurveBuffer.Clear();
 						this.Invalidate();
@@ -356,6 +429,18 @@ namespace BezierCurveEditor.Controls
 
 			this.Invalidate();
 		}
+	}
+
+	public class SelectedItemChangedEventArgs
+	{
+		public SelectedItemChangedEventArgs(Type objectType, object o)
+		{
+			ObjectType = objectType;
+			Object = o;
+		}
+
+		public Type ObjectType { get; private set; }
+		public object Object { get; private set; }
 	}
 
 	public class PointsHierarchyChangedEventArgs
