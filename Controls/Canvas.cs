@@ -18,9 +18,20 @@ namespace BezierCurveEditor.Controls
 
 		public event EventHandler<EventArgs> StatusChanged;
 
-		public void OnStatusChanged()
+		private void OnStatusChanged()
 		{
 			StatusChanged?.Invoke(this, EventArgs.Empty);
+		}
+
+		#endregion
+
+		#region StatusChangedEvent
+
+		public event EventHandler<EventArgs> ErrorChanged;
+
+		private void OnErrorChanged()
+		{
+			ErrorChanged?.Invoke(this, EventArgs.Empty);
 		}
 
 		#endregion
@@ -46,12 +57,14 @@ namespace BezierCurveEditor.Controls
 
 		#endregion
 
+		/// <summary>
+		/// Occurs when new point is added to list, or removed
+		/// </summary>
+		public event EventHandler<PointAddedRemovedEventArgs> PointAddedRemoved;
 
-		public event EventHandler<PointsHierarchyChangedEventArgs> PointsHierarchyChanged;
-
-		private void OnPointsHierarchyChanged(BezierCurve curve)
+		private void OnPointAddedRemoved(Method method, DraggablePoint point, int index)
 		{
-			PointsHierarchyChanged?.Invoke(this, new PointsHierarchyChangedEventArgs(curve));
+			PointAddedRemoved?.Invoke(this, new PointAddedRemovedEventArgs(method, point, index));
 		}
 
 		#region CurvesUpdateEvents
@@ -108,6 +121,19 @@ namespace BezierCurveEditor.Controls
 				if (value == Status) return;
 				_status = value;
 				OnStatusChanged();
+			}
+		}
+
+		private string _error = string.Empty;
+
+		public string Error
+		{
+			get => _error;
+			private set
+			{
+				if (value == Error) return;
+				_error = value;
+				OnErrorChanged();
 			}
 		}
 
@@ -250,6 +276,9 @@ namespace BezierCurveEditor.Controls
 				},
 				{
 					ModeType.Append, new EditorMode(Keys.A, "Append mode", () => { }, () => { })
+				},
+				{
+					ModeType.Prepend, new EditorMode(Keys.P, "Prepend mode", () => {}, () => {})
 				}
 			};
 
@@ -297,15 +326,31 @@ namespace BezierCurveEditor.Controls
 
 					this.Invalidate();
 				}
-				else if (_currentMode == _modes[ModeType.Append])
+				else if (_currentMode == _modes[ModeType.Append] || _currentMode == _modes[ModeType.Prepend])
 				{
 					var selectedCurve = Curves.FirstOrDefault(x => x.Selected);
 					if (selectedCurve != null)
 					{
+						Error = string.Empty;
 						var newPointIndex = selectedCurve.DraggablePoints.TakeWhile(x => !x.PointSelected).Count();
-						if (newPointIndex < selectedCurve.DraggablePoints.Count)
-							newPointIndex++;
+						if (_currentMode == _modes[ModeType.Append])
+						{
+							//one of the points is selected
+							if (newPointIndex != selectedCurve.DraggablePoints.Count)
+								newPointIndex++;
+						}
+						else
+						{
+							//we don't have selected point
+							if (newPointIndex == selectedCurve.DraggablePoints.Count)
+								newPointIndex = 0;
+						}
+
 						selectedCurve.InsertPoint(e.Location, newPointIndex);
+					}
+					else
+					{
+						Error = "You must select curve or point to use this mode";
 					}
 				}
 			}
@@ -317,7 +362,7 @@ namespace BezierCurveEditor.Controls
 			Curves.Add(curve);
 			curve.CurveShouldBeRepainted += CurveCurveShouldBeRepainted;
 			curve.CurveRemoved += Curve_CurveRemoved;
-			curve.PointListChanged += CurveOnPointListChanged;
+			curve.PointAddedRemoved += CurveOnPointAddedRemoved;
 
 			OnCurveAdded(curve, Curves.Count - 1);
 
@@ -346,7 +391,7 @@ namespace BezierCurveEditor.Controls
 			this.Curves.RemoveAt(index);
 			curve.CurveRemoved -= Curve_CurveRemoved;
 			curve.CurveShouldBeRepainted -= CurveCurveShouldBeRepainted;
-			curve.PointListChanged -= CurveOnPointListChanged;
+			curve.PointAddedRemoved -= CurveOnPointAddedRemoved;
 			
 			OnCurveRemoved(curve, index);
 
@@ -354,9 +399,14 @@ namespace BezierCurveEditor.Controls
 			this.Invalidate();
 		}
 
-		private void CurveOnPointListChanged(object sender, EventArgs e)
+		private void CurveOnPointAddedRemoved(object sender, PointAddedRemovedEventArgs e)
 		{
-			OnPointsHierarchyChanged((BezierCurve)sender);
+			if (e.Method == Method.Removed)
+			{
+				SelectedItem = e.Point.Curve;
+			}
+
+			OnPointAddedRemoved(e.Method, e.Point, e.Index);
 			UnsavedChanges = true;
 		}
 
@@ -482,6 +532,7 @@ namespace BezierCurveEditor.Controls
 		Delete = 2,
 		Move = 3,
 		Append = 4,
+		Prepend = 5,
 		Unknown
 	}
 }

@@ -33,11 +33,11 @@ namespace BezierCurveEditor
 		/// <summary>
 		/// Occurs when new point is added to list, or removed
 		/// </summary>
-		public event EventHandler<EventArgs> PointListChanged;
+		public event EventHandler<PointAddedRemovedEventArgs> PointAddedRemoved;
 
-		public void OnPointListChanged()
+		private void OnPointAddedRemoved(Method method, DraggablePoint point, int index)
 		{
-			PointListChanged?.Invoke(this, EventArgs.Empty);
+			PointAddedRemoved?.Invoke(this, new PointAddedRemovedEventArgs(method, point, index));
 		}
 		
 
@@ -102,7 +102,7 @@ namespace BezierCurveEditor
 			DraggablePoints.Insert(index, draggablePoint);
 			_parentControl.Controls.Add(draggablePoint);
 
-			OnPointListChanged();
+			OnPointAddedRemoved(Method.Added, draggablePoint, index);
 		}
 
 		public void DeleteCurve()
@@ -118,7 +118,9 @@ namespace BezierCurveEditor
 		public void DeletePoint(DraggablePoint point)
 		{
 			point.Parent.Controls.Remove(point);
-			DraggablePoints.Remove(point);
+
+			var index = DraggablePoints.IndexOf(point);
+			DraggablePoints.RemoveAt(index);
 
 			//delete curve
 			if (DraggablePoints.Count == 1)
@@ -126,7 +128,7 @@ namespace BezierCurveEditor
 				DeleteCurve();
 				return;
 			}
-			OnPointListChanged();
+			OnPointAddedRemoved(Method.Removed, point, index);
 			OnCurveShouldBeRepainted();
 		}
 
@@ -202,6 +204,26 @@ namespace BezierCurveEditor
 		}
 
 		#endregion
+	}
+
+	public class PointAddedRemovedEventArgs
+	{
+		public PointAddedRemovedEventArgs(Method method, DraggablePoint point, int index)
+		{
+			Method = method;
+			Point = point;
+			Index = index;
+		}
+
+		public Method Method { get; private set; }
+		public DraggablePoint Point { get; private set; }
+		public int Index { get; private set; }
+	}
+
+	public enum Method
+	{
+		Added,
+		Removed
 	}
 
 	internal static class BezierCurveExtensions

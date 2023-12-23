@@ -29,7 +29,9 @@
 		private void InitializeComponent()
 		{
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.canvasModeStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+			this.canvasErrorLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.curvesView = new System.Windows.Forms.TreeView();
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
@@ -43,6 +45,8 @@
 			this.saveAsFileMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			this.exitFileMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.showHelpMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.canvasPanel = new BezierCurveEditor.CustomPanel();
 			this.canvas = new BezierCurveEditor.Controls.Canvas();
 			this.statusStrip1.SuspendLayout();
@@ -54,7 +58,9 @@
 			// 
 			this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.canvasModeStatusLabel});
+            this.toolStripStatusLabel1,
+            this.canvasModeStatusLabel,
+            this.canvasErrorLabel});
 			this.statusStrip1.Location = new System.Drawing.Point(0, 486);
 			this.statusStrip1.Name = "statusStrip1";
 			this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 10, 0);
@@ -62,11 +68,23 @@
 			this.statusStrip1.TabIndex = 2;
 			this.statusStrip1.Text = "statusStrip1";
 			// 
+			// toolStripStatusLabel1
+			// 
+			this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+			this.toolStripStatusLabel1.Size = new System.Drawing.Size(93, 17);
+			this.toolStripStatusLabel1.Text = "Press F1 for help";
+			// 
 			// canvasModeStatusLabel
 			// 
 			this.canvasModeStatusLabel.Name = "canvasModeStatusLabel";
 			this.canvasModeStatusLabel.Size = new System.Drawing.Size(99, 17);
 			this.canvasModeStatusLabel.Text = "Test123 status bar";
+			// 
+			// canvasErrorLabel
+			// 
+			this.canvasErrorLabel.ForeColor = System.Drawing.Color.Red;
+			this.canvasErrorLabel.Name = "canvasErrorLabel";
+			this.canvasErrorLabel.Size = new System.Drawing.Size(0, 17);
 			// 
 			// curvesView
 			// 
@@ -90,7 +108,6 @@
 			this.label1.Size = new System.Drawing.Size(40, 13);
 			this.label1.TabIndex = 4;
 			this.label1.Text = "Curves";
-			this.label1.Click += new System.EventHandler(this.label1_Click);
 			// 
 			// label2
 			// 
@@ -106,7 +123,8 @@
 			// 
 			this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileMenu});
+            this.fileMenu,
+            this.helpToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
@@ -132,52 +150,74 @@
 			// newFileMenu
 			// 
 			this.newFileMenu.Name = "newFileMenu";
-			this.newFileMenu.Size = new System.Drawing.Size(112, 22);
+			this.newFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+			this.newFileMenu.Size = new System.Drawing.Size(184, 22);
 			this.newFileMenu.Text = "New";
 			this.newFileMenu.Click += new System.EventHandler(this.newFileMenu_Click);
 			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(109, 6);
+			this.toolStripSeparator1.Size = new System.Drawing.Size(181, 6);
 			// 
 			// openFileMenu
 			// 
 			this.openFileMenu.Name = "openFileMenu";
-			this.openFileMenu.Size = new System.Drawing.Size(112, 22);
+			this.openFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+			this.openFileMenu.Size = new System.Drawing.Size(184, 22);
 			this.openFileMenu.Text = "Open";
 			this.openFileMenu.Click += new System.EventHandler(this.openFileMenu_Click);
 			// 
 			// toolStripSeparator2
 			// 
 			this.toolStripSeparator2.Name = "toolStripSeparator2";
-			this.toolStripSeparator2.Size = new System.Drawing.Size(109, 6);
+			this.toolStripSeparator2.Size = new System.Drawing.Size(181, 6);
 			// 
 			// saveFileMenu
 			// 
 			this.saveFileMenu.Name = "saveFileMenu";
-			this.saveFileMenu.Size = new System.Drawing.Size(112, 22);
+			this.saveFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+			this.saveFileMenu.Size = new System.Drawing.Size(184, 22);
 			this.saveFileMenu.Text = "Save";
 			this.saveFileMenu.Click += new System.EventHandler(this.saveFileMenu_Click);
 			// 
 			// saveAsFileMenu
 			// 
 			this.saveAsFileMenu.Name = "saveAsFileMenu";
-			this.saveAsFileMenu.Size = new System.Drawing.Size(112, 22);
+			this.saveAsFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.S)));
+			this.saveAsFileMenu.Size = new System.Drawing.Size(184, 22);
 			this.saveAsFileMenu.Text = "Save as";
 			this.saveAsFileMenu.Click += new System.EventHandler(this.saveAsFileMenu_Click);
 			// 
 			// toolStripSeparator3
 			// 
 			this.toolStripSeparator3.Name = "toolStripSeparator3";
-			this.toolStripSeparator3.Size = new System.Drawing.Size(109, 6);
+			this.toolStripSeparator3.Size = new System.Drawing.Size(181, 6);
 			// 
 			// exitFileMenu
 			// 
 			this.exitFileMenu.Name = "exitFileMenu";
-			this.exitFileMenu.Size = new System.Drawing.Size(112, 22);
+			this.exitFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
+			this.exitFileMenu.Size = new System.Drawing.Size(184, 22);
 			this.exitFileMenu.Text = "Exit";
 			this.exitFileMenu.Click += new System.EventHandler(this.exitFileMenu_Click);
+			// 
+			// helpToolStripMenuItem
+			// 
+			this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showHelpMenu});
+			this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+			this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+			this.helpToolStripMenuItem.Text = "Help";
+			// 
+			// showHelpMenu
+			// 
+			this.showHelpMenu.Name = "showHelpMenu";
+			this.showHelpMenu.ShortcutKeys = System.Windows.Forms.Keys.F1;
+			this.showHelpMenu.Size = new System.Drawing.Size(180, 22);
+			this.showHelpMenu.Text = "Show help";
+			this.showHelpMenu.Click += new System.EventHandler(this.showHelpMenu_Click);
 			// 
 			// canvasPanel
 			// 
@@ -249,6 +289,10 @@
 		private System.Windows.Forms.ToolStripMenuItem exitFileMenu;
 		private System.Windows.Forms.ToolStripMenuItem newFileMenu;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+		private System.Windows.Forms.ToolStripStatusLabel canvasErrorLabel;
+		private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem showHelpMenu;
 	}
 }
 
