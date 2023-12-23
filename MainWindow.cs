@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Windows.Forms;
 using BezierCurveEditor.Controls;
@@ -313,7 +314,16 @@ namespace BezierCurveEditor
 
 		private void showHelpMenu_Click(object sender, EventArgs e)
 		{
+			//todo:
+			string appPath = Assembly.GetEntryAssembly().Location;
+			string filename = Path.Combine(Path.GetDirectoryName(appPath), "help.htm");
+			Process.Start(filename);
+		}
 
+		private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			var aboutForm = new AboutBox();
+			aboutForm.ShowDialog();
 		}
 	}
 }

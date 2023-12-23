@@ -49,6 +49,7 @@
 			this.showHelpMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.canvasPanel = new BezierCurveEditor.CustomPanel();
 			this.canvas = new BezierCurveEditor.Controls.Canvas();
+			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.canvasPanel.SuspendLayout();
@@ -206,7 +207,8 @@
 			// helpToolStripMenuItem
 			// 
 			this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showHelpMenu});
+            this.showHelpMenu,
+            this.aboutToolStripMenuItem});
 			this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
 			this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
 			this.helpToolStripMenuItem.Text = "Help";
@@ -241,6 +243,13 @@
 			this.canvas.SelectedItem = null;
 			this.canvas.Size = new System.Drawing.Size(656, 349);
 			this.canvas.TabIndex = 0;
+			// 
+			// aboutToolStripMenuItem
+			// 
+			this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+			this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.aboutToolStripMenuItem.Text = "About";
+			this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
 			// 
 			// MainWindow
 			// 
@@ -293,6 +302,7 @@
 		private System.Windows.Forms.ToolStripStatusLabel canvasErrorLabel;
 		private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem showHelpMenu;
+		private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
 	}
 }
 

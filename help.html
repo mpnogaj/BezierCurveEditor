@@ -1,0 +1,71 @@
+<html>
+	<head>
+		<title>Help</title>
+
+		<style>
+			table, th, td {
+				border: 0.5px solid black;
+				border-collapse: collapse;
+				padding: 7px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Help - Bézier Curve Editor</h1>
+
+		<h2>Modes</h2>
+		<p>
+			Editor uses modes to...<br>
+			Available modes:
+		</p>
+		
+		<table>
+			<thead>
+				<tr>
+					<th>Mode name</th>
+					<th>Activation key</th>
+					<th>Short description</th>
+					<th>Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th>Normal</th>
+					<th>ESCAPE</th>
+					<th>Just normal mode</th>
+					<th>-</th>
+				</tr>
+				<tr>
+					<th>Insert</th>
+					<th>I</th>
+					<th>Insert new curves. Click on canvas to add control points. Pressing shift and clicking will end curve</th>
+					<th>-</th>
+				</tr>
+				<tr>
+					<th>Move</th>
+					<th>M</th>
+					<th>Move points around the canvas</th>
+					<th>-</th>
+				</tr>
+				<tr>
+					<th>Delete</th>
+					<th>D</th>
+					<th>Delete points</th>
+					<th>-</th>
+				</tr>
+				<tr>
+					<th>Append</th>
+					<th>A</th>
+					<th>Adds point after selected point in a curve. If no point is selected new point will be added at the end of the selected curve</th>
+					<th>If no curve or point is selected error will be displayed</th>
+				</tr>
+				<tr>
+					<th>Prepend</th>
+					<th>P</th>
+					<th>Adds point before selected point in a curve. If no point is selected new point will be added at the beggining of the selected curve</th>
+					<th>If no curve or point is selected error will be displayed</th>
+				</tr>
+			</tbody>
+		</table>
+	</body>
+</html>
