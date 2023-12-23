@@ -127,6 +127,7 @@ namespace BezierCurveEditor
 				return;
 			}
 			OnPointListChanged();
+			OnCurveShouldBeRepainted();
 		}
 
 		public void DisableDrag()
