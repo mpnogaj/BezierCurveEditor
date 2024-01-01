@@ -27,15 +27,14 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutBox));
 			this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.logoPictureBox = new System.Windows.Forms.PictureBox();
 			this.labelProductName = new System.Windows.Forms.Label();
 			this.labelVersion = new System.Windows.Forms.Label();
 			this.labelAuthor = new System.Windows.Forms.Label();
+			this.labelAuthorNick = new System.Windows.Forms.Label();
 			this.textBoxDescription = new System.Windows.Forms.TextBox();
 			this.okButton = new System.Windows.Forms.Button();
-			this.labelAuthorNick = new System.Windows.Forms.Label();
 			this.tableLayoutPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).BeginInit();
 			this.SuspendLayout();
@@ -43,8 +42,8 @@
 			// tableLayoutPanel
 			// 
 			this.tableLayoutPanel.ColumnCount = 2;
-			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33F));
-			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 67F));
+			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel.Controls.Add(this.logoPictureBox, 0, 0);
 			this.tableLayoutPanel.Controls.Add(this.labelProductName, 1, 0);
 			this.tableLayoutPanel.Controls.Add(this.labelVersion, 1, 1);
@@ -68,11 +67,11 @@
 			// logoPictureBox
 			// 
 			this.logoPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.logoPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("logoPictureBox.Image")));
+			this.logoPictureBox.Image = global::BezierCurveEditor.Properties.Resources.tall_logo;
 			this.logoPictureBox.Location = new System.Drawing.Point(3, 3);
 			this.logoPictureBox.Name = "logoPictureBox";
 			this.tableLayoutPanel.SetRowSpan(this.logoPictureBox, 6);
-			this.logoPictureBox.Size = new System.Drawing.Size(131, 259);
+			this.logoPictureBox.Size = new System.Drawing.Size(175, 259);
 			this.logoPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.logoPictureBox.TabIndex = 12;
 			this.logoPictureBox.TabStop = false;
@@ -80,11 +79,11 @@
 			// labelProductName
 			// 
 			this.labelProductName.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.labelProductName.Location = new System.Drawing.Point(143, 0);
+			this.labelProductName.Location = new System.Drawing.Point(187, 0);
 			this.labelProductName.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
 			this.labelProductName.MaximumSize = new System.Drawing.Size(0, 17);
 			this.labelProductName.Name = "labelProductName";
-			this.labelProductName.Size = new System.Drawing.Size(271, 17);
+			this.labelProductName.Size = new System.Drawing.Size(227, 17);
 			this.labelProductName.TabIndex = 19;
 			this.labelProductName.Text = "Bézier Curve Editor";
 			this.labelProductName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -92,11 +91,11 @@
 			// labelVersion
 			// 
 			this.labelVersion.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.labelVersion.Location = new System.Drawing.Point(143, 26);
+			this.labelVersion.Location = new System.Drawing.Point(187, 26);
 			this.labelVersion.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
 			this.labelVersion.MaximumSize = new System.Drawing.Size(0, 17);
 			this.labelVersion.Name = "labelVersion";
-			this.labelVersion.Size = new System.Drawing.Size(271, 17);
+			this.labelVersion.Size = new System.Drawing.Size(227, 17);
 			this.labelVersion.TabIndex = 0;
 			this.labelVersion.Text = "1.0";
 			this.labelVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -104,25 +103,37 @@
 			// labelAuthor
 			// 
 			this.labelAuthor.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.labelAuthor.Location = new System.Drawing.Point(143, 52);
+			this.labelAuthor.Location = new System.Drawing.Point(187, 52);
 			this.labelAuthor.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
 			this.labelAuthor.MaximumSize = new System.Drawing.Size(0, 17);
 			this.labelAuthor.Name = "labelAuthor";
-			this.labelAuthor.Size = new System.Drawing.Size(271, 17);
+			this.labelAuthor.Size = new System.Drawing.Size(227, 17);
 			this.labelAuthor.TabIndex = 21;
 			this.labelAuthor.Text = "Marcin Nogaj";
 			this.labelAuthor.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// labelAuthorNick
+			// 
+			this.labelAuthorNick.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.labelAuthorNick.Location = new System.Drawing.Point(187, 78);
+			this.labelAuthorNick.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
+			this.labelAuthorNick.MaximumSize = new System.Drawing.Size(0, 17);
+			this.labelAuthorNick.Name = "labelAuthorNick";
+			this.labelAuthorNick.Size = new System.Drawing.Size(227, 17);
+			this.labelAuthorNick.TabIndex = 22;
+			this.labelAuthorNick.Text = "mpnogaj";
+			this.labelAuthorNick.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
 			// textBoxDescription
 			// 
 			this.textBoxDescription.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.textBoxDescription.Location = new System.Drawing.Point(143, 107);
+			this.textBoxDescription.Location = new System.Drawing.Point(187, 107);
 			this.textBoxDescription.Margin = new System.Windows.Forms.Padding(6, 3, 3, 3);
 			this.textBoxDescription.Multiline = true;
 			this.textBoxDescription.Name = "textBoxDescription";
 			this.textBoxDescription.ReadOnly = true;
 			this.textBoxDescription.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.textBoxDescription.Size = new System.Drawing.Size(271, 126);
+			this.textBoxDescription.Size = new System.Drawing.Size(227, 126);
 			this.textBoxDescription.TabIndex = 23;
 			this.textBoxDescription.TabStop = false;
 			// 
@@ -135,18 +146,6 @@
 			this.okButton.Size = new System.Drawing.Size(75, 23);
 			this.okButton.TabIndex = 24;
 			this.okButton.Text = "&OK";
-			// 
-			// labelAuthorNick
-			// 
-			this.labelAuthorNick.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.labelAuthorNick.Location = new System.Drawing.Point(143, 78);
-			this.labelAuthorNick.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
-			this.labelAuthorNick.MaximumSize = new System.Drawing.Size(0, 17);
-			this.labelAuthorNick.Name = "labelAuthorNick";
-			this.labelAuthorNick.Size = new System.Drawing.Size(271, 17);
-			this.labelAuthorNick.TabIndex = 22;
-			this.labelAuthorNick.Text = "mpnogaj";
-			this.labelAuthorNick.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// AboutBox
 			// 

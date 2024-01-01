@@ -29,13 +29,12 @@ namespace BezierCurveEditor
 			get
 			{
 				object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
-				if (attributes.Length > 0)
+				if (attributes.Length <= 0)
+					return System.IO.Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase);
+				var titleAttribute = (AssemblyTitleAttribute)attributes[0];
+				if (titleAttribute.Title != "")
 				{
-					AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute)attributes[0];
-					if (titleAttribute.Title != "")
-					{
-						return titleAttribute.Title;
-					}
+					return titleAttribute.Title;
 				}
 				return System.IO.Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase);
 			}

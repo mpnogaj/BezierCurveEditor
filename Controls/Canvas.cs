@@ -318,10 +318,19 @@ namespace BezierCurveEditor.Controls
 				if (_currentMode == _modes[ModeType.Insert])
 				{
 					_addCurveBuffer.Add(e.Location);
-					if (ModifierKeys == Keys.Shift && _addCurveBuffer.Count > 1)
+					if (_addCurveBuffer.Count >= 2)
 					{
-						CreateCurve(_addCurveBuffer);
-						_addCurveBuffer.Clear();
+						if (ModifierKeys == Keys.Control)
+						{
+							CreateCurve(_addCurveBuffer);
+							_addCurveBuffer.Clear();
+							_addCurveBuffer.Add(e.Location);
+						}
+						else if (ModifierKeys == Keys.Shift)
+						{
+							CreateCurve(_addCurveBuffer);
+							_addCurveBuffer.Clear();
+						}
 					}
 
 					this.Invalidate();
@@ -415,9 +424,20 @@ namespace BezierCurveEditor.Controls
 		public bool HandleKeyPressed(Keys key)
 		{
 			var mode = _modes.Values.FirstOrDefault(x => x.ModeKey == key);
-			if (mode == null) return false;
-			CurrentMode = mode;
-			return true;
+			if (mode != null)
+			{
+				CurrentMode = mode;
+				return true;
+			}
+
+			if (key == Keys.Enter && CurrentMode == _modes[ModeType.Insert] && _addCurveBuffer.Count >= 2)
+			{
+				CreateCurve(_addCurveBuffer);
+				_addCurveBuffer.Clear();
+				this.Invalidate();
+			}
+
+			return false;
 		}
 
 		public void ChangeMode(ModeType mode)

@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -86,7 +88,9 @@ namespace BezierCurveEditor
 			{
 				var draggablePoint = new DraggablePoint(this);
 				draggablePoint.LocationChanged += DraggablePoint_LocationChanged;
-				draggablePoint.Location = point;
+				var halfH = draggablePoint.Size.Height / 2;
+				var halfW = draggablePoint.Size.Width / 2;
+				draggablePoint.Location = new Point(point.X - halfW, point.Y - halfH);
 				DraggablePoints.Add(draggablePoint);
 			}
 			
@@ -98,10 +102,12 @@ namespace BezierCurveEditor
 		{
 			var draggablePoint = new DraggablePoint(this);
 			draggablePoint.LocationChanged += DraggablePoint_LocationChanged;
-			draggablePoint.Location = point;
+			var halfH = draggablePoint.Size.Height / 2;
+			var halfW = draggablePoint.Size.Width / 2;
+			draggablePoint.Location = new Point(point.X - halfW, point.Y - halfH);
 			DraggablePoints.Insert(index, draggablePoint);
+			
 			_parentControl.Controls.Add(draggablePoint);
-
 			OnPointAddedRemoved(Method.Added, draggablePoint, index);
 		}
 
@@ -173,15 +179,38 @@ namespace BezierCurveEditor
 			var senderControl = (Control)sender;
 			var location = senderControl.Location;
 
-			var newLocation = new Point(Math.Max(location.X, 0), Math.Max(location.Y, 0));
+			var halfH = senderControl.Size.Height / 2;
+			var halfW = senderControl.Size.Width / 2;
+
+			var newLocation = new Point(Math.Max(location.X, -halfW), Math.Max(location.Y, -halfH));
 			senderControl.Location = newLocation;
 
 			OnCurveShouldBeRepainted();
 		}
 
+		public void WriteSvgPath(StreamWriter outputStream)
+		{
+			var nfi = new NumberFormatInfo
+			{
+				NumberDecimalSeparator = "."
+			};
+
+			var points = GetBezierApproximation();
+
+			outputStream.Write($"<path fill-opacity=\"0\" stroke=\"black\" stroke-width=\"1\" d=\"M {points[0].X.ToString(nfi)},{points[0].Y.ToString(nfi)}");
+
+			for (var i = 1; i < points.Length; i++)
+			{
+				outputStream.Write($" L {points[i].X.ToString(nfi)},{points[i].Y.ToString(nfi)}");
+			}
+
+			outputStream.WriteLine("\"/>");
+			outputStream.Flush();
+		}
+
 		#region BezierPointsApproximation
 
-		public PointF[] GetBezierApproximation(int outputSegmentCount = 128)
+		public PointF[] GetBezierApproximation(int outputSegmentCount = 512)
 		{
 			var controlPoints = this.ControlPoints;
 
@@ -233,7 +262,6 @@ namespace BezierCurveEditor
 			Pen mainPen,
 			bool drawHelper = false, 
 			Pen helperPen = null)
-
 		{
 			var curvePoints = curve.ControlPoints;
 			var points = curve.GetBezierApproximation(32);

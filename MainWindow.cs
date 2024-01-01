@@ -1,9 +1,11 @@
 ﻿using System;
-using System.CodeDom;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Channels;
 using System.Text.Json;
 using System.Windows.Forms;
 using BezierCurveEditor.Controls;
@@ -14,6 +16,7 @@ namespace BezierCurveEditor
 	{
 		private readonly string _defaultPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 		private readonly string _fileDialogsFilter = @"Drawings (*.drw)|*.drw";
+		private readonly string _exportFileDialogsFilter = @"BMP (*.bmp)|*.bmp|PNG (*.png)|*.png|SVG (*.svg)|*.svg";
 
 
 		private string _fileName = string.Empty;
@@ -25,6 +28,14 @@ namespace BezierCurveEditor
 			{
 				if (value == FileName) return;
 				_fileName = value;
+				if (_fileName == string.Empty)
+				{
+					this.Text = "Bézier Curve Editor";
+				}
+				else
+				{
+					this.Text = $"Bézier Curve Editor - {_fileName}";
+				}
 			}
 		}
 
@@ -42,12 +53,20 @@ namespace BezierCurveEditor
 
 			canvas.SelectedItemChanged += Canvas_SelectedItemChanged;
 
+			canvas.Resize += (sender, args) =>
+			{
+				this.canvasSizeStatusLabel.Text = $"{canvas.Width} × {canvas.Height} px.";
+			};
+
 			canvas.ErrorChanged += (sender, args) =>
 			{
 				canvasErrorLabel.Text = canvas.Error;
 			};
 
 			canvasModeStatusLabel.Text = canvas.CurrentMode.StatusBarText;
+			
+			this.Text = "Bézier Curve Editor";
+			this.canvasSizeStatusLabel.Text = $"{canvas.Width} × {canvas.Height} px.";
 		}
 
 		private void Canvas_PointAddedRemoved(object sender, PointAddedRemovedEventArgs e)
@@ -314,9 +333,8 @@ namespace BezierCurveEditor
 
 		private void showHelpMenu_Click(object sender, EventArgs e)
 		{
-			//todo:
-			string appPath = Assembly.GetEntryAssembly().Location;
-			string filename = Path.Combine(Path.GetDirectoryName(appPath), "help.html");
+			var appPath = Assembly.GetEntryAssembly().Location;
+			var filename = Path.Combine(Path.GetDirectoryName(appPath), "help.html");
 			Process.Start(filename);
 		}
 
@@ -324,6 +342,66 @@ namespace BezierCurveEditor
 		{
 			var aboutForm = new AboutBox();
 			aboutForm.ShowDialog();
+		}
+
+		private void exportFileMenu_Click(object sender, EventArgs e)
+		{
+			var sfd = new SaveFileDialog
+			{
+				InitialDirectory = _defaultPath,
+				Filter = _exportFileDialogsFilter,
+				RestoreDirectory = true,
+				AddExtension = true,
+				DefaultExt = "bmp",
+				Title = "Export"
+			};
+
+			if (sfd.ShowDialog() != DialogResult.OK) return;
+
+			if (Path.GetExtension(sfd.FileName) == ".svg")
+			{
+				var stream = sfd.OpenFile();
+
+				using var sw = new StreamWriter(stream);
+				sw.WriteLine("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>");
+				sw.WriteLine("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">");
+				sw.WriteLine("<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"");
+				sw.WriteLine($"\twidth=\"{canvas.Width}\" height=\"{canvas.Height}\" viewBox=\"0,0,{canvas.Width},{canvas.Height}\">");
+
+				foreach (var bezierCurve in canvas.Curves)
+				{
+					bezierCurve.WriteSvgPath(sw);
+				}
+
+				sw.WriteLine("</svg>");
+				sw.Close();
+			}
+			else
+			{
+				var oldSelection = canvas.SelectedItem;
+				var oldBackground = canvas.BackColor;
+
+				canvas.SelectedItem = null;
+				canvas.BackColor = Color.White;
+
+				var bitmap = new Bitmap(canvas.Width, canvas.Height);
+				canvas.DrawToBitmap(bitmap, canvas.ClientRectangle);
+
+				var format = Path.GetExtension(sfd.FileName) switch
+				{
+					".bmp" => ImageFormat.Bmp,
+					".png" => ImageFormat.Png,
+					_ => null
+				};
+
+				if (format != null)
+				{
+					bitmap.Save(sfd.FileName, format);
+				}
+
+				canvas.SelectedItem = oldSelection;
+				canvas.BackColor = oldBackground;
+			}
 		}
 	}
 }

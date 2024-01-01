@@ -1,12 +1,11 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Bézier Curve Editor")]
-[assembly: AssemblyDescription("Simple program to create drawingw with Bézier curves")]
+[assembly: AssemblyDescription("Simple, mode based, editor to create drawings using Bézier curves")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Marcin Nogaj")]
 [assembly: AssemblyProduct("Bézier Curve Editor")]
