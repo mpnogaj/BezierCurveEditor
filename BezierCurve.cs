@@ -17,7 +17,7 @@ namespace BezierCurveEditor
 		/// </summary>
 		public event EventHandler<EventArgs> CurveShouldBeRepainted;
 		
-		private void OnCurveShouldBeRepainted()
+		public void OnCurveShouldBeRepainted()
 		{
 			CurveShouldBeRepainted?.Invoke(this, EventArgs.Empty);
 		}
@@ -142,8 +142,7 @@ namespace BezierCurveEditor
 		{
 			foreach (var draggablePoint in DraggablePoints)
 			{
-				draggablePoint.Draggable(false);
-				draggablePoint.Cursor = Cursors.Default;
+				draggablePoint.EnableDrag(false);
 			}
 		}
 
@@ -151,8 +150,7 @@ namespace BezierCurveEditor
 		{
 			foreach (var draggablePoint in DraggablePoints)
 			{
-				draggablePoint.Draggable(true);
-				draggablePoint.Cursor = Cursors.SizeAll;
+				draggablePoint.EnableDrag(true);
 			}
 		}
 
@@ -261,7 +259,7 @@ namespace BezierCurveEditor
 			Graphics graphics,
 			Pen mainPen,
 			bool drawHelper = false, 
-			Pen helperPen = null)
+			Pen? helperPen = null)
 		{
 			var curvePoints = curve.ControlPoints;
 			var points = curve.GetBezierApproximation(32);

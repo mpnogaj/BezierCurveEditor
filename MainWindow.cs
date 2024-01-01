@@ -5,7 +5,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Remoting.Channels;
 using System.Text.Json;
 using System.Windows.Forms;
 using BezierCurveEditor.Controls;

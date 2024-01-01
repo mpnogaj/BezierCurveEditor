@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace BezierCurveEditor.Controls
@@ -18,6 +19,14 @@ namespace BezierCurveEditor.Controls
 			{
 				if (value == _pointSelected) return;
 				_pointSelected = value;
+
+				var anyDraggableIsSelected = Curve.DraggablePoints.Any(x => x.PointSelected);
+				foreach (var draggablePoint in Curve.DraggablePoints)
+				{
+					draggablePoint.Visible = anyDraggableIsSelected;
+				}
+				
+				this.Curve.OnCurveShouldBeRepainted();
 				this.Invalidate();
 			}
 		}
@@ -47,6 +56,12 @@ namespace BezierCurveEditor.Controls
 			this.Curve.DeletePoint(this);
 		}
 
+		public void EnableDrag(bool value)
+		{
+			this.Draggable(value);
+			this.Cursor = value ? Cursors.SizeAll : Cursors.Default;
+		}
+
 		public BezierCurve Curve { get;}
 
 		public DraggablePoint(BezierCurve curve)
@@ -64,10 +79,11 @@ namespace BezierCurveEditor.Controls
 
 		private void DraggablePoint_Paint(object sender, PaintEventArgs e)
 		{
-			//do not draw points if curve isn't selected
-			if (!Curve.Selected) return;
+			//do not draw points if curve isn't selected or any of it's points
+			if (!(PointSelected || Curve.Selected || Curve.DraggablePoints.Any(x => x.PointSelected)))
+				return;
 
-			var color = PointSelected ? _activeColor : _inactiveColor;
+			var color = (Curve.Selected || PointSelected) ? _activeColor : _inactiveColor;
 			var pen = new Pen(new SolidBrush(color), 2f);
 
 			e.Graphics.DrawRectangle(pen, ((Control)sender).ClientRectangle);
@@ -79,7 +95,9 @@ namespace BezierCurveEditor.Controls
 
 		protected override void WndProc(ref Message message)
 		{
-			if (message.Msg == (int)WM_NCHITTEST && !Curve.Selected)
+			var shouldBeHitTestVisible = Curve.Selected | PointSelected;
+
+			if (message.Msg == (int)WM_NCHITTEST && !shouldBeHitTestVisible)
 				message.Result = (IntPtr)HTTRANSPARENT;
 			else
 				base.WndProc(ref message);

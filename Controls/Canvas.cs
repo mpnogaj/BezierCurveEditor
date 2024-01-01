@@ -137,9 +137,9 @@ namespace BezierCurveEditor.Controls
 			}
 		}
 
-		private object _selectedItem = null;
+		private object? _selectedItem = null;
 
-		public object SelectedItem
+		public object? SelectedItem
 		{
 			get => _selectedItem;
 			set
@@ -150,45 +150,21 @@ namespace BezierCurveEditor.Controls
 
 				switch (previousValue)
 				{
-					case null:
-						switch (value)
-						{
-							case BezierCurve curve:
-								curve.Selected = true;
-								break;
-							case DraggablePoint point:
-								point.PointSelected = true;
-								point.Curve.Selected = true;
-								break;
-						}
-
-						break;
 					case BezierCurve previousCurve:
 						previousCurve.Selected = false;
-						switch (value)
-						{
-							case BezierCurve curve:
-								curve.Selected = true;
-								break;
-							case DraggablePoint point:
-								point.PointSelected = true;
-								point.Curve.Selected = true;
-								break;
-						}
 						break;
 					case DraggablePoint previousPoint:
 						previousPoint.PointSelected = false;
-						previousPoint.Curve.Selected = false;
-						switch (value)
-						{
-							case BezierCurve curve:
-								curve.Selected = true;
-								break;
-							case DraggablePoint point:
-								point.PointSelected = true;
-								point.Curve.Selected = true;
-								break;
-						}
+						break;
+				}
+
+				switch (value)
+				{
+					case BezierCurve curve:
+						curve.Selected = true;
+						break;
+					case DraggablePoint point:
+						point.PointSelected = true;
 						break;
 				}
 
@@ -300,7 +276,9 @@ namespace BezierCurveEditor.Controls
 			graphics.SmoothingMode = SmoothingMode.HighQuality;
 			foreach (var bezierCurve in Curves)
 			{
-				bezierCurve.DrawCurve(graphics, pen, bezierCurve.Selected, helperPen);
+				var drawHelper = bezierCurve.Selected || bezierCurve.DraggablePoints.Any(x => x.PointSelected);
+
+				bezierCurve.DrawCurve(graphics, pen, drawHelper, helperPen);
 			}
 
 			foreach (var point in _addCurveBuffer)
