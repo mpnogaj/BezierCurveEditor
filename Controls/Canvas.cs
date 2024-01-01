@@ -426,10 +426,10 @@ namespace BezierCurveEditor.Controls
 
 		public DataModel SaveCurves()
 		{
-			var curves = Curves.Select(x => x.DraggablePoints.Select(y => new PointModel
+			var curves = Curves.Select(x => x.ControlPoints.Select(p => new PointModel
 			{
-				X = y.Location.X,
-				Y = y.Location.Y
+				X = p.X,
+				Y = p.Y
 			}).ToList()).ToList();
 
 			this.UnsavedChanges = false;

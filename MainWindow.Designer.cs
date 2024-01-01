@@ -65,29 +65,31 @@
             this.canvasModeStatusLabel,
             this.canvasSizeStatusLabel,
             this.canvasErrorLabel});
-			this.statusStrip1.Location = new System.Drawing.Point(0, 486);
+			this.statusStrip1.Location = new System.Drawing.Point(0, 484);
 			this.statusStrip1.Name = "statusStrip1";
 			this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 10, 0);
-			this.statusStrip1.Size = new System.Drawing.Size(1018, 22);
+			this.statusStrip1.Size = new System.Drawing.Size(1018, 24);
 			this.statusStrip1.TabIndex = 2;
 			this.statusStrip1.Text = "statusStrip1";
 			// 
 			// canvasModeStatusLabel
 			// 
+			this.canvasModeStatusLabel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
 			this.canvasModeStatusLabel.Name = "canvasModeStatusLabel";
-			this.canvasModeStatusLabel.Size = new System.Drawing.Size(99, 17);
+			this.canvasModeStatusLabel.Size = new System.Drawing.Size(103, 19);
 			this.canvasModeStatusLabel.Text = "Test123 status bar";
 			// 
 			// canvasSizeStatusLabel
 			// 
+			this.canvasSizeStatusLabel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
 			this.canvasSizeStatusLabel.Name = "canvasSizeStatusLabel";
-			this.canvasSizeStatusLabel.Size = new System.Drawing.Size(0, 17);
+			this.canvasSizeStatusLabel.Size = new System.Drawing.Size(4, 19);
 			// 
 			// canvasErrorLabel
 			// 
 			this.canvasErrorLabel.ForeColor = System.Drawing.Color.Red;
 			this.canvasErrorLabel.Name = "canvasErrorLabel";
-			this.canvasErrorLabel.Size = new System.Drawing.Size(0, 17);
+			this.canvasErrorLabel.Size = new System.Drawing.Size(0, 19);
 			// 
 			// curvesView
 			// 

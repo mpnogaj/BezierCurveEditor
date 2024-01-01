@@ -142,7 +142,7 @@ namespace BezierCurveEditor
 		{
 			foreach (var draggablePoint in DraggablePoints)
 			{
-				draggablePoint.EnableDrag(false);
+				draggablePoint.Draggable = false;
 			}
 		}
 
@@ -150,7 +150,7 @@ namespace BezierCurveEditor
 		{
 			foreach (var draggablePoint in DraggablePoints)
 			{
-				draggablePoint.EnableDrag(true);
+				draggablePoint.Draggable = true;
 			}
 		}
 
@@ -159,7 +159,6 @@ namespace BezierCurveEditor
 			foreach (var draggablePoint in DraggablePoints)
 			{
 				draggablePoint.Removable = false;
-				draggablePoint.Cursor = Cursors.Default;
 			}
 		}
 
@@ -168,7 +167,6 @@ namespace BezierCurveEditor
 			foreach (var draggablePoint in DraggablePoints)
 			{
 				draggablePoint.Removable = true;
-				draggablePoint.Cursor = Cursors.Cross;
 			}
 		}
 

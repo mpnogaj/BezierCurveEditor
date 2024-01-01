@@ -31,6 +31,7 @@ namespace BezierCurveEditor.Controls
 			}
 		}
 
+		#region Removable stuff
 		private bool _removable = false;
 
 		public bool Removable
@@ -40,6 +41,9 @@ namespace BezierCurveEditor.Controls
 			{
 				if (value == _removable) return;
 				_removable = value;
+				this.Cursor = value ? Cursors.Cross : Cursors.Default;
+
+
 				if (_removable)
 				{
 					this.Click += DraggablePoint_Remove_Click;
@@ -53,14 +57,82 @@ namespace BezierCurveEditor.Controls
 
 		private void DraggablePoint_Remove_Click(object sender, EventArgs e)
 		{
-			this.Curve.DeletePoint(this);
+			if (this.Curve.Selected && (Control.ModifierKeys & Keys.Control) == Keys.Control)
+			{
+				this.Curve.DeleteCurve();
+			}
+			else
+			{ 
+				this.Curve.DeletePoint(this);
+			}
+		}
+		#endregion
+
+		#region Draggable stuff
+		private bool _draggable = false;
+
+		public bool Draggable
+		{
+			get => _draggable;
+			set
+			{
+				if (value == _draggable) return;
+				_draggable = value;
+
+				this.Cursor = value ? Cursors.SizeAll : Cursors.Default;
+
+				if (_draggable)
+				{
+					this.MouseDown += DraggablePoint_MouseDown;
+					this.MouseUp += DraggablePoint_MouseUp;
+					this.MouseMove += DraggablePoint_MouseMove;
+				}
+				else
+				{
+					this.MouseDown -= DraggablePoint_MouseDown;
+					this.MouseUp -= DraggablePoint_MouseUp;
+					this.MouseMove -= DraggablePoint_MouseMove;
+				}
+			}
 		}
 
-		public void EnableDrag(bool value)
+		private bool _isDragged = false;
+		private Size _mouseOffset;
+
+		private void DraggablePoint_MouseDown(object sender, MouseEventArgs e)
 		{
-			this.Draggable(value);
-			this.Cursor = value ? Cursors.SizeAll : Cursors.Default;
+			_mouseOffset = new Size(e.Location);
+			_isDragged = true;
 		}
+
+		private void DraggablePoint_MouseUp(object sender, MouseEventArgs e)
+		{
+			_isDragged = false;
+		}
+
+		private void DraggablePoint_MouseMove(object sender, MouseEventArgs e)
+		{
+			if (!_isDragged) return;
+			var locationOffset = e.Location - _mouseOffset;
+			if (Curve.Selected && (Control.ModifierKeys & Keys.Control) == Keys.Control)
+			{
+				foreach (var draggablePoint in Curve.DraggablePoints)
+				{
+					var newLocation = draggablePoint.Location;
+					newLocation.Offset(locationOffset.X, locationOffset.Y);
+					draggablePoint.Location = newLocation;
+				}
+			}
+			else
+			{	
+				var newLocation = this.Location;
+				newLocation.Offset(locationOffset.X, locationOffset.Y);
+				this.Location = newLocation;
+			}
+		}
+
+
+		#endregion
 
 		public BezierCurve Curve { get;}
 
