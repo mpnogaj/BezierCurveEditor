@@ -164,29 +164,6 @@ namespace BezierCurveEditor
 			//e.Handled = true;
 		}
 
-		private void curvesView_KeyUp(object sender, KeyEventArgs e)
-		{
-			var selectedNode = curvesView.SelectedNode;
-			if (selectedNode != null)
-			{
-				if (e.KeyCode == Keys.Delete)
-				{
-					switch (selectedNode)
-					{
-						case ExtTreeNode<BezierCurve> newSelectedCurve:
-							newSelectedCurve.Data.DeleteCurve();
-							break;
-						case ExtTreeNode<DraggablePoint> newSelectedPoint:
-							newSelectedPoint.Data.Curve.DeletePoint(newSelectedPoint.Data);
-							break;
-					}
-				}
-			}
-
-			e.Handled = true;
-			e.SuppressKeyPress = true;
-		}
-
 
 		private bool PickFileName()
 		{
@@ -401,6 +378,29 @@ namespace BezierCurveEditor
 				canvas.SelectedItem = oldSelection;
 				canvas.BackColor = oldBackground;
 			}
+		}
+
+		private void curvesView_KeyDown(object sender, KeyEventArgs e)
+		{
+			var selectedNode = curvesView.SelectedNode;
+			if (selectedNode != null)
+			{
+				if (e.KeyCode == Keys.Delete)
+				{
+					switch (selectedNode)
+					{
+						case ExtTreeNode<BezierCurve> newSelectedCurve:
+							newSelectedCurve.Data.DeleteCurve();
+							break;
+						case ExtTreeNode<DraggablePoint> newSelectedPoint:
+							newSelectedPoint.Data.Curve.DeletePoint(newSelectedPoint.Data);
+							break;
+					}
+				}
+			}
+
+			e.Handled = true;
+			e.SuppressKeyPress = true;
 		}
 	}
 }

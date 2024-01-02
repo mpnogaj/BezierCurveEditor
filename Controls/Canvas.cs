@@ -206,10 +206,11 @@ namespace BezierCurveEditor.Controls
 
 			_modes = new Dictionary<ModeType, EditorMode>
 			{
-				{ ModeType.Normal, new EditorMode(Keys.Escape, "Normal mode", () =>
-				{
-					SelectedItem = null;
-				}, () => { }) },
+				{ 
+					ModeType.Normal, new EditorMode(Keys.Escape, "Normal mode", () =>
+					{
+						SelectedItem = null;
+					}, () => { }) },
 				{
 					ModeType.Insert, new EditorMode(Keys.I, "Insert mode", () =>
 					{
@@ -315,25 +316,44 @@ namespace BezierCurveEditor.Controls
 				}
 				else if (_currentMode == _modes[ModeType.Append] || _currentMode == _modes[ModeType.Prepend])
 				{
-					var selectedCurve = Curves.FirstOrDefault(x => x.Selected);
-					if (selectedCurve != null)
+					if (SelectedItem != null)
 					{
 						Error = string.Empty;
-						var newPointIndex = selectedCurve.DraggablePoints.TakeWhile(x => !x.PointSelected).Count();
-						if (_currentMode == _modes[ModeType.Append])
+						BezierCurve curve;
+						DraggablePoint? point;
+
+						switch (SelectedItem)
 						{
-							//one of the points is selected
-							if (newPointIndex != selectedCurve.DraggablePoints.Count)
-								newPointIndex++;
-						}
-						else
-						{
-							//we don't have selected point
-							if (newPointIndex == selectedCurve.DraggablePoints.Count)
-								newPointIndex = 0;
+							case BezierCurve selectedCurve:
+								curve = selectedCurve;
+								point = null;
+								break;
+							case DraggablePoint selectedPoint:
+								curve = selectedPoint.Curve;
+								point = selectedPoint;
+								break;
+							default:
+								return;
 						}
 
-						selectedCurve.InsertPoint(e.Location, newPointIndex);
+						var newPointIndex = point == null ? -1 : curve.DraggablePoints.IndexOf(point);
+						if (newPointIndex == -1)
+						{
+							if (CurrentMode == _modes[ModeType.Append])
+							{
+								newPointIndex = curve.DraggablePoints.Count;
+							}
+							else if (CurrentMode == _modes[ModeType.Prepend])
+							{
+								newPointIndex = 0;
+							}
+						}
+						else if (CurrentMode == _modes[ModeType.Append])
+						{
+							newPointIndex++;
+						}
+
+						curve.InsertPoint(e.Location, newPointIndex);
 					}
 					else
 					{
@@ -459,11 +479,15 @@ namespace BezierCurveEditor.Controls
 			//clear flag
 			UnsavedChanges = false;
 
+			CurrentMode.ModeActivated();
+
 			this.Invalidate();
 		}
 
 		public void Clear(bool shouldMarkUnsavedChanges = true)
 		{
+			CurrentMode.ModeDeactivated();
+
 			while (Curves.Count > 0)
 			{
 				Curves[0].DeleteCurve();
