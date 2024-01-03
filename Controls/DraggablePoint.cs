@@ -97,6 +97,7 @@ namespace BezierCurveEditor.Controls
 		}
 
 		private bool _isDragged = false;
+		private DraggablePoint? _snapTo = null;
 		private Size _mouseOffset;
 
 		private void DraggablePoint_MouseDown(object sender, MouseEventArgs e)
@@ -107,6 +108,11 @@ namespace BezierCurveEditor.Controls
 
 		private void DraggablePoint_MouseUp(object sender, MouseEventArgs e)
 		{
+			if (_snapTo != null)
+			{
+				this.Location = _snapTo.Location;
+			}
+
 			_isDragged = false;
 		}
 
@@ -128,6 +134,18 @@ namespace BezierCurveEditor.Controls
 				var newLocation = this.Location;
 				newLocation.Offset(locationOffset.X, locationOffset.Y);
 				this.Location = newLocation;
+
+				_snapTo = null;
+				var otherCurves = this.Curve.Canvas.Curves.Where(c => c != this.Curve);
+				foreach (var curve in otherCurves)
+				{
+					var candidate = curve.DraggablePoints
+					                     .FirstOrDefault(x => x.Location.Distance(this.Location) < 5.0);
+
+					if (candidate == null) continue;
+					_snapTo = candidate;
+					break;
+				}
 			}
 		}
 

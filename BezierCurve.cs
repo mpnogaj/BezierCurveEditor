@@ -73,6 +73,7 @@ namespace BezierCurveEditor
 		}).ToList();
 
 		private readonly Canvas _parentControl;
+		public Canvas Canvas => _parentControl;
 
 		public BezierCurve(List<Point> points, Canvas parent)
 		{
@@ -172,15 +173,6 @@ namespace BezierCurveEditor
 
 		private void DraggablePoint_LocationChanged(object sender, EventArgs e)
 		{
-			var senderControl = (Control)sender;
-			var location = senderControl.Location;
-
-			var halfH = senderControl.Size.Height / 2;
-			var halfW = senderControl.Size.Width / 2;
-
-			var newLocation = new Point(Math.Max(location.X, -halfW), Math.Max(location.Y, -halfH));
-			senderControl.Location = newLocation;
-
 			OnCurveShouldBeRepainted();
 		}
 

@@ -10,7 +10,28 @@ namespace BezierCurveEditor.Controls
 {
 	public partial class Canvas : UserControl
 	{
+		public const int CharacterXOffset = 200;
+		public const int CharacterYOffset = 100;
+
+		public const int CharacterWidth = 90;
+		public const int CharacterHeight = 115;
+
 		public bool UnsavedChanges { get; private set; }
+
+
+		private bool _drawBorderPen = false;
+
+		public bool DrawFontBorder
+		{
+			get => _drawBorderPen;
+			set
+			{
+				if (value == _drawBorderPen) return;
+				_drawBorderPen = value;
+				//force canvas to redraw
+				this.Invalidate();
+			}
+		}
 
 		#region Events
 
@@ -271,6 +292,13 @@ namespace BezierCurveEditor.Controls
 
 		private void Canvas_Paint(object sender, PaintEventArgs e)
 		{
+			if (DrawFontBorder)
+			{
+				var borderPen = new Pen(new SolidBrush(Color.Green), 2.0f);
+				e.Graphics.DrawRectangle(borderPen, new Rectangle(CharacterXOffset, CharacterYOffset, CharacterWidth, CharacterHeight));
+			}
+
+
 			var pen = new Pen(Color.Black, 2);
 			var helperPen = new Pen(Color.FromArgb(184, 94, 42), 1);
 			var graphics = e.Graphics;
@@ -500,6 +528,16 @@ namespace BezierCurveEditor.Controls
 			}
 
 			this.Invalidate();
+		}
+
+		private void Canvas_DoubleClick(object sender, EventArgs e)
+		{
+			if (CurrentMode == _modes[ModeType.Move] && SelectedItem is DraggablePoint point)
+			{
+				var args = (e as MouseEventArgs)!;
+				
+				point.Location = new Point(args.X, args.Y);
+			}
 		}
 	}
 

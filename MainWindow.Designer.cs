@@ -44,7 +44,6 @@
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.saveFileMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveAsFileMenu = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			this.exportFileMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
 			this.exitFileMenu = new System.Windows.Forms.ToolStripMenuItem();
@@ -53,6 +52,11 @@
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.canvasPanel = new BezierCurveEditor.CustomPanel();
 			this.canvas = new BezierCurveEditor.Controls.Canvas();
+			this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+			this.characterBoxFileMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.saveAsCharacterFileMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+			this.openAsCharacterFileMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.canvasPanel.SuspendLayout();
@@ -141,12 +145,16 @@
             this.newFileMenu,
             this.toolStripSeparator1,
             this.openFileMenu,
+            this.openAsCharacterFileMenu,
             this.toolStripSeparator2,
             this.saveFileMenu,
             this.saveAsFileMenu,
-            this.toolStripSeparator3,
-            this.exportFileMenu,
+            this.saveAsCharacterFileMenu,
             this.toolStripSeparator4,
+            this.exportFileMenu,
+            this.toolStripSeparator5,
+            this.characterBoxFileMenu,
+            this.toolStripSeparator6,
             this.exitFileMenu});
 			this.fileMenu.Name = "fileMenu";
 			this.fileMenu.Size = new System.Drawing.Size(46, 24);
@@ -156,33 +164,33 @@
 			// 
 			this.newFileMenu.Name = "newFileMenu";
 			this.newFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-			this.newFileMenu.Size = new System.Drawing.Size(231, 26);
+			this.newFileMenu.Size = new System.Drawing.Size(333, 26);
 			this.newFileMenu.Text = "New";
 			this.newFileMenu.Click += new System.EventHandler(this.newFileMenu_Click);
 			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(228, 6);
+			this.toolStripSeparator1.Size = new System.Drawing.Size(330, 6);
 			// 
 			// openFileMenu
 			// 
 			this.openFileMenu.Name = "openFileMenu";
 			this.openFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-			this.openFileMenu.Size = new System.Drawing.Size(231, 26);
+			this.openFileMenu.Size = new System.Drawing.Size(333, 26);
 			this.openFileMenu.Text = "Open";
 			this.openFileMenu.Click += new System.EventHandler(this.openFileMenu_Click);
 			// 
 			// toolStripSeparator2
 			// 
 			this.toolStripSeparator2.Name = "toolStripSeparator2";
-			this.toolStripSeparator2.Size = new System.Drawing.Size(228, 6);
+			this.toolStripSeparator2.Size = new System.Drawing.Size(330, 6);
 			// 
 			// saveFileMenu
 			// 
 			this.saveFileMenu.Name = "saveFileMenu";
 			this.saveFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-			this.saveFileMenu.Size = new System.Drawing.Size(231, 26);
+			this.saveFileMenu.Size = new System.Drawing.Size(333, 26);
 			this.saveFileMenu.Text = "Save";
 			this.saveFileMenu.Click += new System.EventHandler(this.saveFileMenu_Click);
 			// 
@@ -191,34 +199,29 @@
 			this.saveAsFileMenu.Name = "saveAsFileMenu";
 			this.saveAsFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
-			this.saveAsFileMenu.Size = new System.Drawing.Size(231, 26);
+			this.saveAsFileMenu.Size = new System.Drawing.Size(333, 26);
 			this.saveAsFileMenu.Text = "Save as";
 			this.saveAsFileMenu.Click += new System.EventHandler(this.saveAsFileMenu_Click);
-			// 
-			// toolStripSeparator3
-			// 
-			this.toolStripSeparator3.Name = "toolStripSeparator3";
-			this.toolStripSeparator3.Size = new System.Drawing.Size(228, 6);
 			// 
 			// exportFileMenu
 			// 
 			this.exportFileMenu.Name = "exportFileMenu";
 			this.exportFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.E)));
-			this.exportFileMenu.Size = new System.Drawing.Size(231, 26);
+			this.exportFileMenu.Size = new System.Drawing.Size(333, 26);
 			this.exportFileMenu.Text = "Export";
 			this.exportFileMenu.Click += new System.EventHandler(this.exportFileMenu_Click);
 			// 
 			// toolStripSeparator4
 			// 
 			this.toolStripSeparator4.Name = "toolStripSeparator4";
-			this.toolStripSeparator4.Size = new System.Drawing.Size(228, 6);
+			this.toolStripSeparator4.Size = new System.Drawing.Size(330, 6);
 			// 
 			// exitFileMenu
 			// 
 			this.exitFileMenu.Name = "exitFileMenu";
 			this.exitFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-			this.exitFileMenu.Size = new System.Drawing.Size(231, 26);
+			this.exitFileMenu.Size = new System.Drawing.Size(333, 26);
 			this.exitFileMenu.Text = "Exit";
 			this.exitFileMenu.Click += new System.EventHandler(this.exitFileMenu_Click);
 			// 
@@ -262,12 +265,51 @@
 			// canvas
 			// 
 			this.canvas.BackColor = System.Drawing.Color.White;
+			this.canvas.DrawFontBorder = false;
 			this.canvas.Location = new System.Drawing.Point(3, 2);
 			this.canvas.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
 			this.canvas.Name = "canvas";
 			this.canvas.SelectedItem = null;
 			this.canvas.Size = new System.Drawing.Size(875, 430);
 			this.canvas.TabIndex = 0;
+			// 
+			// toolStripSeparator5
+			// 
+			this.toolStripSeparator5.Name = "toolStripSeparator5";
+			this.toolStripSeparator5.Size = new System.Drawing.Size(330, 6);
+			// 
+			// characterBoxFileMenu
+			// 
+			this.characterBoxFileMenu.CheckOnClick = true;
+			this.characterBoxFileMenu.Name = "characterBoxFileMenu";
+			this.characterBoxFileMenu.Size = new System.Drawing.Size(333, 26);
+			this.characterBoxFileMenu.Text = "Character box";
+			this.characterBoxFileMenu.CheckedChanged += new System.EventHandler(this.characterBoxFileMenu_Click_CheckedChanged);
+			// 
+			// saveAsCharacterFileMenu
+			// 
+			this.saveAsCharacterFileMenu.Name = "saveAsCharacterFileMenu";
+			this.saveAsCharacterFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)((((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.S)));
+			this.saveAsCharacterFileMenu.Size = new System.Drawing.Size(333, 26);
+			this.saveAsCharacterFileMenu.Text = "Save as character";
+			this.saveAsCharacterFileMenu.Click += new System.EventHandler(this.saveAsCharacterFileMenu_Click);
+			// 
+			// toolStripSeparator6
+			// 
+			this.toolStripSeparator6.Name = "toolStripSeparator6";
+			this.toolStripSeparator6.Size = new System.Drawing.Size(330, 6);
+			// 
+			// openAsCharacterFileMenu
+			// 
+			this.openAsCharacterFileMenu.Name = "openAsCharacterFileMenu";
+			this.openAsCharacterFileMenu.ShortcutKeys = ((System.Windows.Forms.Keys)((((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.O)));
+			this.openAsCharacterFileMenu.Size = new System.Drawing.Size(333, 26);
+			this.openAsCharacterFileMenu.Text = "Open as character";
+			this.openAsCharacterFileMenu.Click += new System.EventHandler(this.openAsCharacterFileMenu_Click);
 			// 
 			// MainWindow
 			// 
@@ -312,7 +354,6 @@
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 		private System.Windows.Forms.ToolStripMenuItem saveFileMenu;
 		private System.Windows.Forms.ToolStripMenuItem saveAsFileMenu;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 		private System.Windows.Forms.ToolStripMenuItem exitFileMenu;
 		private System.Windows.Forms.ToolStripMenuItem newFileMenu;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
@@ -323,6 +364,11 @@
 		private System.Windows.Forms.ToolStripMenuItem exportFileMenu;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
 		private System.Windows.Forms.ToolStripStatusLabel canvasSizeStatusLabel;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+		private System.Windows.Forms.ToolStripMenuItem characterBoxFileMenu;
+		private System.Windows.Forms.ToolStripMenuItem saveAsCharacterFileMenu;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+		private System.Windows.Forms.ToolStripMenuItem openAsCharacterFileMenu;
 	}
 }
 

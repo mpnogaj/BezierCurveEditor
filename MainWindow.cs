@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Windows.Forms;
 using BezierCurveEditor.Controls;
@@ -356,9 +357,11 @@ namespace BezierCurveEditor
 			{
 				var oldSelection = canvas.SelectedItem;
 				var oldBackground = canvas.BackColor;
+				var drawFontBox = canvas.DrawFontBorder;
 
 				canvas.SelectedItem = null;
 				canvas.BackColor = Color.White;
+				canvas.DrawFontBorder = false;
 
 				var bitmap = new Bitmap(canvas.Width, canvas.Height);
 				canvas.DrawToBitmap(bitmap, canvas.ClientRectangle);
@@ -375,6 +378,7 @@ namespace BezierCurveEditor
 					bitmap.Save(sfd.FileName, format);
 				}
 
+				canvas.DrawFontBorder = drawFontBox;
 				canvas.SelectedItem = oldSelection;
 				canvas.BackColor = oldBackground;
 			}
@@ -401,6 +405,79 @@ namespace BezierCurveEditor
 
 			e.Handled = true;
 			e.SuppressKeyPress = true;
+		}
+
+		private void characterBoxFileMenu_Click_CheckedChanged(object sender, EventArgs e)
+		{
+			canvas.DrawFontBorder = ((ToolStripMenuItem)sender).Checked;
+		}
+
+		private void saveAsCharacterFileMenu_Click(object sender, EventArgs e)
+		{
+			if(!PickFileName()) return;
+
+			var dataModel = canvas.SaveCurves();
+
+			//override some settings
+			dataModel.Curves.ForEach((curve) =>
+			{
+				curve.ForEach(x =>
+				{
+					x.X -= Canvas.CharacterXOffset;
+					x.Y -= Canvas.CharacterYOffset;
+				});
+			});
+
+			dataModel.CanvasWidth = Canvas.CharacterWidth;
+			dataModel.CanvasHeight = Canvas.CharacterHeight;
+
+			var json = JsonSerializer.Serialize(dataModel);
+			using var sw = new StreamWriter(FileName, append: false);
+			sw.Write(json);
+		}
+
+		private void openAsCharacterFileMenu_Click(object sender, EventArgs e)
+		{
+			if (canvas.UnsavedChanges)
+			{
+				var handled = UnsavedChangesPopup();
+				if (!handled) return;
+			}
+
+			var ofd = new OpenFileDialog
+			{
+				InitialDirectory = _defaultPath,
+				Filter = _fileDialogsFilter,
+				RestoreDirectory = false,
+				Multiselect = false,
+				Title = "Open as charcter"
+			};
+
+			if (ofd.ShowDialog() != DialogResult.OK) return;
+
+			var fileName = ofd.FileName;
+			using var fileStream = ofd.OpenFile();
+			var dataModel = JsonSerializer.Deserialize<DataModel>(fileStream)!;
+
+			dataModel.Curves.ForEach(curve =>
+			{
+				curve.ForEach((point) =>
+				{
+					point.X += Canvas.CharacterXOffset;
+					point.Y += Canvas.CharacterYOffset;
+				});
+			});
+
+			dataModel.CanvasWidth = Math.Min(dataModel.CanvasWidth,
+				dataModel.CanvasWidth + Canvas.CharacterXOffset + Canvas.CharacterWidth);
+			dataModel.CanvasHeight = Math.Min(dataModel.CanvasHeight,
+				dataModel.CanvasHeight + Canvas.CharacterYOffset + Canvas.CharacterHeight);
+			
+			FileName = fileName;
+
+			canvas.Clear();
+			curvesView.Nodes.Clear();
+			canvas.LoadCurves(dataModel);
 		}
 	}
 }
