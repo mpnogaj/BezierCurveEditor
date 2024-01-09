@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BezierCurveEditor", "BezierCurveEditor.csproj", "{D7251525-AFE5-433D-B13B-0C3255B2E15D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BezierCurveEditor", "Editor\BezierCurveEditor.csproj", "{D7251525-AFE5-433D-B13B-0C3255B2E15D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FontPacker", "FontPacker\FontPacker.csproj", "{029FA73D-D8A4-4276-AA71-3F5F55976F8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{8882A40F-7BD2-40FE-BA38-1A1E3CF2FD75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BezierFontTextBoxDemo", "BezierFontTextBoxDemo\BezierFontTextBoxDemo.csproj", "{062F66E5-5B0D-40BC-8518-3E12256FD782}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +21,18 @@ Global
 		{D7251525-AFE5-433D-B13B-0C3255B2E15D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7251525-AFE5-433D-B13B-0C3255B2E15D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7251525-AFE5-433D-B13B-0C3255B2E15D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{029FA73D-D8A4-4276-AA71-3F5F55976F8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{029FA73D-D8A4-4276-AA71-3F5F55976F8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{029FA73D-D8A4-4276-AA71-3F5F55976F8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{029FA73D-D8A4-4276-AA71-3F5F55976F8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8882A40F-7BD2-40FE-BA38-1A1E3CF2FD75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8882A40F-7BD2-40FE-BA38-1A1E3CF2FD75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8882A40F-7BD2-40FE-BA38-1A1E3CF2FD75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8882A40F-7BD2-40FE-BA38-1A1E3CF2FD75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{062F66E5-5B0D-40BC-8518-3E12256FD782}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{062F66E5-5B0D-40BC-8518-3E12256FD782}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{062F66E5-5B0D-40BC-8518-3E12256FD782}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{062F66E5-5B0D-40BC-8518-3E12256FD782}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

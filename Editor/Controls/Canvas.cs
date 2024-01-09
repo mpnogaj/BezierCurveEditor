@@ -5,16 +5,15 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
+using BezierCurveEditor.Properties;
+using Common;
 
 namespace BezierCurveEditor.Controls
 {
 	public partial class Canvas : UserControl
 	{
-		public const int CharacterXOffset = 200;
-		public const int CharacterYOffset = 100;
-
-		public const int CharacterWidth = 90;
-		public const int CharacterHeight = 115;
+		//public const int CharacterXOffset = 200;
+		//public const int CharacterYOffset = 100;
 
 		public bool UnsavedChanges { get; private set; }
 
@@ -295,7 +294,7 @@ namespace BezierCurveEditor.Controls
 			if (DrawFontBorder)
 			{
 				var borderPen = new Pen(new SolidBrush(Color.Green), 2.0f);
-				e.Graphics.DrawRectangle(borderPen, new Rectangle(CharacterXOffset, CharacterYOffset, CharacterWidth, CharacterHeight));
+				e.Graphics.DrawRectangle(borderPen, new Rectangle(Settings.Default.CharBoxPosX, Settings.Default.CharBoxPosY, CharacterData.CharacterWidth, CharacterData.CharacterHeight));
 			}
 
 
@@ -472,7 +471,7 @@ namespace BezierCurveEditor.Controls
 			CurrentMode = _modes[mode];
 		}
 
-		public DataModel SaveCurves()
+		public DrawingModel SaveCurves()
 		{
 			var curves = Curves.Select(x => x.ControlPoints.Select(p => new PointModel
 			{
@@ -482,7 +481,7 @@ namespace BezierCurveEditor.Controls
 
 			this.UnsavedChanges = false;
 
-			return new DataModel()
+			return new DrawingModel()
 			{
 				CanvasHeight = this.Height,
 				CanvasWidth = this.Width,
@@ -490,7 +489,7 @@ namespace BezierCurveEditor.Controls
 			};
 		}
 
-		public void LoadCurves(DataModel model)
+		public void LoadCurves(DrawingModel model)
 		{
 			Clear();
 

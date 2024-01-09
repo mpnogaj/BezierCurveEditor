@@ -108,7 +108,7 @@ namespace BezierCurveEditor.Controls
 
 		private void DraggablePoint_MouseUp(object sender, MouseEventArgs e)
 		{
-			if (_snapTo != null)
+			if (_snapTo != null && (Control.ModifierKeys & Keys.Alt) == Keys.Alt)
 			{
 				this.Location = _snapTo.Location;
 			}

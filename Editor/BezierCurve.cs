@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Common;
 
 namespace BezierCurveEditor
 {
@@ -183,7 +184,7 @@ namespace BezierCurveEditor
 				NumberDecimalSeparator = "."
 			};
 
-			var points = GetBezierApproximation();
+			var points = Bezier.GetBezierApproximation(ControlPoints);
 
 			outputStream.Write($"<path fill-opacity=\"0\" stroke=\"black\" stroke-width=\"1\" d=\"M {points[0].X.ToString(nfi)},{points[0].Y.ToString(nfi)}");
 
@@ -195,32 +196,6 @@ namespace BezierCurveEditor
 			outputStream.WriteLine("\"/>");
 			outputStream.Flush();
 		}
-
-		#region BezierPointsApproximation
-
-		public PointF[] GetBezierApproximation(int outputSegmentCount = 512)
-		{
-			var controlPoints = this.ControlPoints;
-
-			var points = new PointF[outputSegmentCount + 1];
-			for (var i = 0; i <= outputSegmentCount; i++)
-			{
-				var t = (double)i / outputSegmentCount;
-				points[i] = GetBezierPoint(t, controlPoints, 0, controlPoints.Count);
-			}
-			return points;
-		}
-
-		private PointF GetBezierPoint(double t, IReadOnlyList<Point> controlPoints, int index, int count)
-		{
-			if (count == 1)
-				return controlPoints[index];
-			var p0 = GetBezierPoint(t, controlPoints, index, count - 1);
-			var p1 = GetBezierPoint(t, controlPoints, index + 1, count - 1);
-			return new PointF(Convert.ToSingle((1 - t) * p0.X + t * p1.X), Convert.ToSingle((1 - t) * p0.Y + t * p1.Y));
-		}
-
-		#endregion
 	}
 
 	public class PointAddedRemovedEventArgs
@@ -252,7 +227,7 @@ namespace BezierCurveEditor
 			Pen? helperPen = null)
 		{
 			var curvePoints = curve.ControlPoints;
-			var points = curve.GetBezierApproximation(32);
+			var points = Bezier.GetBezierApproximation(curvePoints, 32);
 
 			if (drawHelper)
 			{

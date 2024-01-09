@@ -6,18 +6,25 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
 using System.Windows.Forms;
 using BezierCurveEditor.Controls;
+using BezierCurveEditor.Properties;
+using Common;
+using Newtonsoft.Json;
 
 namespace BezierCurveEditor
 {
 	public partial class MainWindow : Form
 	{
 		private readonly string _defaultPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-		private readonly string _fileDialogsFilter = @"Drawings (*.drw)|*.drw";
-		private readonly string _exportFileDialogsFilter = @"BMP (*.bmp)|*.bmp|PNG (*.png)|*.png|SVG (*.svg)|*.svg";
 
+		private readonly string _fileDialogsFilter =
+			$@"Drawings (*{FileExtension.DrawingExtension})|*{FileExtension.DrawingExtension}";
+
+		private readonly string _charFilesFilter =
+			$@"Character file (*{FileExtension.CharExtension})|*{FileExtension.CharExtension}";
+
+		private readonly string _exportFileDialogsFilter = @"BMP (*.bmp)|*.bmp|PNG (*.png)|*.png|SVG (*.svg)|*.svg";
 
 		private string _fileName = string.Empty;
 
@@ -188,7 +195,7 @@ namespace BezierCurveEditor
 		private void Save()
 		{
 			var dataModel = canvas.SaveCurves();
-			var json = JsonSerializer.Serialize(dataModel);
+			var json = JsonConvert.SerializeObject(dataModel);
 			using var sw = new StreamWriter(FileName, append: false);
 			sw.Write(json);
 		}
@@ -227,7 +234,9 @@ namespace BezierCurveEditor
 
 			var fileName = ofd.FileName;
 			using var fileStream = ofd.OpenFile();
-			var dataModel = JsonSerializer.Deserialize<DataModel>(fileStream);
+			using var sr = new StreamReader(fileStream);
+			var dataModel = JsonConvert.DeserializeObject<DrawingModel>(sr.ReadToEnd())!;
+			
 			FileName = fileName;
 
 			canvas.Clear();
@@ -414,7 +423,16 @@ namespace BezierCurveEditor
 
 		private void saveAsCharacterFileMenu_Click(object sender, EventArgs e)
 		{
-			if(!PickFileName()) return;
+			var sfd = new SaveFileDialog()
+			{
+				InitialDirectory = _defaultPath,
+				Filter = _charFilesFilter,
+				AddExtension = true,
+				DefaultExt = FileExtension.CharExtension,
+				Title = "Save as character"
+			};
+
+			if (sfd.ShowDialog() != DialogResult.OK) return;
 
 			var dataModel = canvas.SaveCurves();
 
@@ -423,16 +441,18 @@ namespace BezierCurveEditor
 			{
 				curve.ForEach(x =>
 				{
-					x.X -= Canvas.CharacterXOffset;
-					x.Y -= Canvas.CharacterYOffset;
+					x.X -= Settings.Default.CharBoxPosX;
+					x.Y -= Settings.Default.CharBoxPosY;
 				});
 			});
 
-			dataModel.CanvasWidth = Canvas.CharacterWidth;
-			dataModel.CanvasHeight = Canvas.CharacterHeight;
+			var charModel = new FontModel()
+			{
+				Curves = dataModel.Curves
+			};
 
-			var json = JsonSerializer.Serialize(dataModel);
-			using var sw = new StreamWriter(FileName, append: false);
+			var json = JsonConvert.SerializeObject(charModel);
+			using var sw = new StreamWriter(sfd.FileName, append: false);
 			sw.Write(json);
 		}
 
@@ -447,37 +467,58 @@ namespace BezierCurveEditor
 			var ofd = new OpenFileDialog
 			{
 				InitialDirectory = _defaultPath,
-				Filter = _fileDialogsFilter,
-				RestoreDirectory = false,
+				Filter = _charFilesFilter,
 				Multiselect = false,
-				Title = "Open as charcter"
+				Title = "Open charcter file"
 			};
 
 			if (ofd.ShowDialog() != DialogResult.OK) return;
 
 			var fileName = ofd.FileName;
 			using var fileStream = ofd.OpenFile();
-			var dataModel = JsonSerializer.Deserialize<DataModel>(fileStream)!;
+			using var sr = new StreamReader(fileStream);
+			var fontModel = JsonConvert.DeserializeObject<FontModel>(sr.ReadToEnd())!;
 
-			dataModel.Curves.ForEach(curve =>
+			fontModel.Curves.ForEach(curve =>
 			{
 				curve.ForEach((point) =>
 				{
-					point.X += Canvas.CharacterXOffset;
-					point.Y += Canvas.CharacterYOffset;
+					point.X += Settings.Default.CharBoxPosX;
+					point.Y += Settings.Default.CharBoxPosY;
 				});
 			});
 
-			dataModel.CanvasWidth = Math.Min(dataModel.CanvasWidth,
-				dataModel.CanvasWidth + Canvas.CharacterXOffset + Canvas.CharacterWidth);
-			dataModel.CanvasHeight = Math.Min(dataModel.CanvasHeight,
-				dataModel.CanvasHeight + Canvas.CharacterYOffset + Canvas.CharacterHeight);
+			var drawingModel = new DrawingModel()
+			{
+				Curves = fontModel.Curves,
+				CanvasWidth = Settings.Default.CharBoxPosX + CharacterData.CharacterWidth,
+				CanvasHeight = Settings.Default.CharBoxPosY + CharacterData.CharacterHeight
+			};
 			
-			FileName = fileName;
-
 			canvas.Clear();
 			curvesView.Nodes.Clear();
-			canvas.LoadCurves(dataModel);
+			canvas.LoadCurves(drawingModel);
+		}
+
+		private void setCharBoxPosFileMenu_Click(object sender, EventArgs e)
+		{
+			var dialog = new CharacterBoxPosForm
+			{
+				PosX = Settings.Default.CharBoxPosX,
+				PosY = Settings.Default.CharBoxPosY
+			};
+			var result = dialog.ShowDialog();
+
+			if (result != DialogResult.OK) return;
+
+			var x = dialog.PosX;
+			var y = dialog.PosY;
+
+			Settings.Default.CharBoxPosX = x;
+			Settings.Default.CharBoxPosY = y;
+			Settings.Default.Save();
+				
+			canvas.Invalidate();
 		}
 	}
 }
