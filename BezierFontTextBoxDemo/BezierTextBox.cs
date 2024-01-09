@@ -48,6 +48,19 @@ namespace BezierFontTextBoxDemo
 			}
 		}
 
+		private SmoothingMode _smoothingMode = SmoothingMode.None;
+
+		public SmoothingMode SmoothingMode
+		{
+			get => _smoothingMode;
+			set
+			{
+				if(value == _smoothingMode) return;
+				_smoothingMode = value;
+				Invalidate();
+			}
+		}
+
 		public BezierTextBox()
 		{
 			InitializeComponent();
@@ -156,7 +169,7 @@ namespace BezierFontTextBoxDemo
 
 		private void BezierTextBox_Paint(object sender, PaintEventArgs e)
 		{
-			e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+			e.Graphics.SmoothingMode = SmoothingMode;
 
 			var pen = new Pen(Color.Black, 2.0f);
 

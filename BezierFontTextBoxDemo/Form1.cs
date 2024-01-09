@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
 using Common;
 
@@ -9,6 +11,8 @@ namespace BezierFontTextBoxDemo
 		public Form1()
 		{
 			InitializeComponent();
+
+			smoothingOptions.Items.AddRange(Enum.GetNames(typeof(SmoothingMode)).Take(4).Cast<object>().ToArray());
 		}
 
 		private void loadFontBtn_Click(object sender, EventArgs e)
@@ -29,6 +33,11 @@ namespace BezierFontTextBoxDemo
 		private void textBox_TextChanged(object sender, EventArgs e)
 		{
 			bezierTextBox.Text = textBox.Text;
+		}
+
+		private void smoothingOptions_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			bezierTextBox.SmoothingMode = (SmoothingMode)smoothingOptions.SelectedIndex;
 		}
 	}
 }
